@@ -1,736 +1,899 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
-import Footer from '../components/Footer/Footer';
-import { AuthContext } from '../context/AuthContext';
-import ConfirmModal from '../components/ConfirmModal/ConfirmModal';
-import './Review.css'; // Asegúrate de importar el archivo CSS generado
+/**
+ * ============================================================================
+ * REVIEW PAGE - GLASS-CYAN NEON DESIGN SYSTEM
+ * Complete Enterprise Client-Side Architecture & Controller
+ * ============================================================================
+ */
 
-// Formateador de fecha para la comunidad
-const formatDate = (dateString) => {
-  if (!dateString) return '';
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return '';
-    return date.toLocaleDateString('es-ES', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    });
-  } catch {
-    return '';
-  }
-};
+(function () {
+  'use strict';
 
-// Clasificación inteligente de tipo (Soporta canciones, álbumes y artistas)
-const getTypeLabel = (item) => {
-  if (!item) return 'Álbum';
-
-  if (typeof item === 'string') {
-    const t = item.toLowerCase().trim();
-    if (t.includes('cancion') || t.includes('canción') || t.includes('track') || t.includes('single')) return 'Canción';
-    if (t.includes('artist') || t.includes('artista')) return 'Artista';
-    if (t.includes('album') || t.includes('álbum') || t.includes('disco')) return 'Álbum';
-    return item.charAt(0).toUpperCase() + item.slice(1);
-  }
-
-  const rawType = item.tipo || item.tipo_item || item.type || item.categoria || item.category;
-  if (rawType) {
-    const t = String(rawType).toLowerCase().trim();
-    if (t.includes('cancion') || t.includes('canción') || t.includes('track') || t.includes('single')) return 'Canción';
-    if (t.includes('artist') || t.includes('artista')) return 'Artista';
-    if (t.includes('album') || t.includes('álbum') || t.includes('disco')) return 'Álbum';
-  }
-
-  if (item.duration_ms || item.preview_url || item.track_number || item.is_local !== undefined) {
-    return 'Canción';
-  }
-
-  if (item.followers || (item.genres && !item.album)) return 'Artista';
-  if (item.album_type || item.total_tracks) return 'Álbum';
-
-  const artistStr = String(item.artista || item.artist || '').toLowerCase().trim();
-  const titleStr = String(item.titulo_album || item.titulo || item.name || '').toLowerCase().trim();
-
-  if (artistStr === 'artista principal' || (artistStr && artistStr === titleStr)) {
-    return 'Artista';
-  }
-
-  return 'Álbum';
-};
-
-const getBadgeClass = (item) => {
-  const label = getTypeLabel(item);
-  if (label === 'Canción') return 'badge-cancion';
-  if (label === 'Artista') return 'badge-artista';
-  return 'badge-album';
-};
-
-const getItemImage = (item) => {
-  if (!item) return 'https://via.placeholder.com/150';
-  if (typeof item === 'string' && item.startsWith('http')) return item;
-
-  if (item.imagen_url && item.imagen_url.startsWith('http')) return item.imagen_url;
-  if (item.image && item.image.startsWith('http')) return item.image;
-
-  if (Array.isArray(item.images) && item.images.length > 0 && item.images[0]?.url) {
-    return item.images[0].url;
-  }
-  if (item.album?.images && Array.isArray(item.album.images) && item.album.images[0]?.url) {
-    return item.album.images[0].url;
-  }
-  return 'https://via.placeholder.com/150';
-};
-
-const getItemArtist = (item) => {
-  if (!item) return '';
-
-  const type = getTypeLabel(item);
-
-  if (type === 'Artista') {
-    if (item.artista && item.artista !== 'Artista principal') return item.artista;
-    if (item.artist && item.artist !== 'Artista principal') return item.artist;
-    return item.name || item.titulo || item.titulo_album || '';
-  }
-
-  if (item.artista && item.artista !== 'Artista principal') return item.artista;
-  if (item.artist && item.artist !== 'Artista principal') return item.artist;
-
-  if (Array.isArray(item.artists) && item.artists.length > 0) {
-    return item.artists
-      .map((a) => (typeof a === 'string' ? a : a.name || ''))
-      .filter(Boolean)
-      .join(', ');
-  }
-
-  return '';
-};
-
-const getItemId = (item) => String(item?.id || item?.spotify_artist_id || item?.spotify_album_id || item?.uri || '');
-
-const extractItemsFromSearchResponse = (res) => {
-  if (!res) return [];
-
-  const categorias = res.categorias || res.data?.categorias;
-  if (categorias) {
-    const canciones = (categorias.canciones || categorias.tracks || []).map((item) => ({ ...item, tipo: 'cancion' }));
-    const albumes = (categorias.albumes || categorias.albums || []).map((item) => ({ ...item, tipo: 'album' }));
-    const artistas = (categorias.artistas || categorias.artists || []).map((item) => ({ ...item, tipo: 'artista' }));
-
-    const interleaved = [];
-    const maxLength = Math.max(canciones.length, albumes.length, artistas.length);
-
-    for (let i = 0; i < maxLength; i++) {
-      if (canciones[i]) interleaved.push(canciones[i]);
-      if (albumes[i]) interleaved.push(albumes[i]);
-      if (artistas[i]) interleaved.push(artistas[i]);
-    }
-
-    if (interleaved.length > 0) return interleaved;
-  }
-
-  if (Array.isArray(res.resultados)) {
-    return res.resultados.map((item) => ({
-      ...item,
-      tipo: item.tipo || getTypeLabel(item).toLowerCase(),
-    }));
-  }
-
-  const data = res.data || res;
-  if (Array.isArray(data)) return data;
-
-  const albums = (data.albums?.items || []).map((i) => ({ ...i, tipo: 'album' }));
-  const tracks = (data.tracks?.items || []).map((i) => ({ ...i, tipo: 'cancion' }));
-  const artists = (data.artists?.items || []).map((i) => ({ ...i, tipo: 'artista' }));
-
-  const interleaved = [];
-  const maxLength = Math.max(albums.length, tracks.length, artists.length);
-
-  for (let i = 0; i < maxLength; i++) {
-    if (tracks[i]) interleaved.push(tracks[i]);
-    if (albums[i]) interleaved.push(albums[i]);
-    if (artists[i]) interleaved.push(artists[i]);
-  }
-
-  return interleaved;
-};
-
-function Review() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('Todos');
-  const [showFilterOptions, setShowFilterOptions] = useState(false);
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [searchResults, setSearchResults] = useState([]);
-  const [selectedItem, setSelectedItem] = useState(null);
-
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState('');
-  const [isPublishing, setIsPublishing] = useState(false);
-
-  const { user, isAuthenticated } = useContext(AuthContext);
-  const [favoriteArtistIds, setFavoriteArtistIds] = useState([]);
-  const [selectedArtistFollowers, setSelectedArtistFollowers] = useState(0);
-
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-
-  const [publicReviews, setPublicReviews] = useState([]);
-  const [loadingReviews, setLoadingReviews] = useState(false);
-
-  const searchContainerRef = useRef(null);
-
-  const selectedItemId = getItemId(selectedItem);
-  const isArtistSelected = selectedItem && getTypeLabel(selectedItem) === 'Artista';
-  const isFavorite = isArtistSelected && selectedItemId && favoriteArtistIds.includes(selectedItemId);
-
-  const getCurrentUserId = () => {
-    const currentUser = user || {};
-    return currentUser?.id || currentUser?.usuario_id || currentUser?._id || currentUser?.id_usuario || null;
+  // ==========================================================================
+  // 1. CONFIGURATION, CONSTANTS & INITIAL STATE
+  // ==========================================================================
+  const CONFIG = {
+    STORAGE_KEYS: {
+      REVIEWS: 'neon_app_reviews_v1',
+      FAVORITES: 'neon_app_favorites_v1',
+      RECENT_SEARCHES: 'neon_app_searches_v1'
+    },
+    DEBOUNCE_DELAY: 250,
+    MAX_AUTOCOMPLETE_RESULTS: 6,
+    MAX_FEED_ITEMS_PER_PAGE: 5,
+    AUDIO_ENABLED: true
   };
 
-  const fetchUserFavorites = async () => {
-    const userId = getCurrentUserId();
-    if (!userId) {
-      setFavoriteArtistIds([]);
-      return;
+  // Mock Database con datos enriquecidos
+  const INITIAL_DATABASE = [
+    {
+      id: 'item-1',
+      title: 'Midnight City',
+      artist: 'M83',
+      type: 'cancion',
+      badgeClass: 'badge-cancion',
+      badgeText: 'Canción',
+      img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=400&q=80',
+      followers: '85.2K oyentes',
+      year: '2011',
+      genre: 'Synthwave / Electronic'
+    },
+    {
+      id: 'item-2',
+      title: 'Random Access Memories',
+      artist: 'Daft Punk',
+      type: 'album',
+      badgeClass: 'badge-album',
+      badgeText: 'Álbum',
+      img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=400&q=80',
+      followers: '1.2M oyentes',
+      year: '2013',
+      genre: 'French House / Disco'
+    },
+    {
+      id: 'item-3',
+      title: 'The Weeknd',
+      artist: 'Artista Principal',
+      type: 'artista',
+      badgeClass: 'badge-artista',
+      badgeText: 'Artista',
+      img: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=80',
+      followers: '4.5M oyentes',
+      year: 'Activo desde 2010',
+      genre: 'R&B / Synthpop'
+    },
+    {
+      id: 'item-4',
+      title: 'After Hours',
+      artist: 'The Weeknd',
+      type: 'album',
+      badgeClass: 'badge-album',
+      badgeText: 'Álbum',
+      img: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=400&q=80',
+      followers: '980K oyentes',
+      year: '2020',
+      genre: 'Synthpop'
+    },
+    {
+      id: 'item-5',
+      title: 'Blinding Lights',
+      artist: 'The Weeknd',
+      type: 'cancion',
+      badgeClass: 'badge-cancion',
+      badgeText: 'Canción',
+      img: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=400&q=80',
+      followers: '3.1M oyentes',
+      year: '2019',
+      genre: 'Synth-wave'
+    },
+    {
+      id: 'item-6',
+      title: 'Kavinsky',
+      artist: 'Artista Electrónico',
+      type: 'artista',
+      badgeClass: 'badge-artista',
+      badgeText: 'Artista',
+      img: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=400&q=80',
+      followers: '420K oyentes',
+      year: 'Activo desde 2006',
+      genre: 'Outrun / Electro House'
+    },
+    {
+      id: 'item-7',
+      title: 'Nightcall',
+      artist: 'Kavinsky',
+      type: 'cancion',
+      badgeClass: 'badge-cancion',
+      badgeText: 'Canción',
+      img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=400&q=80',
+      followers: '610K oyentes',
+      year: '2010',
+      genre: 'Synthwave'
     }
+  ];
 
-    try {
-      const res = await fetch(`https://soundboard-api-gyf6.onrender.com/api/usuarios/${encodeURIComponent(userId)}/favoritos`);
-      if (res.ok) {
-        const data = await res.json();
-        const ids = Array.isArray(data) ? data.map((fav) => String(fav.spotify_artist_id)) : [];
-        setFavoriteArtistIds(ids);
-      }
-    } catch (err) {
-      console.error('Error al cargar favoritos del usuario:', err);
-    }
+  // Estado global de la aplicación
+  const state = {
+    database: [...INITIAL_DATABASE],
+    activeFilter: 'Todos',
+    searchQuery: '',
+    selectedItem: INITIAL_DATABASE[0],
+    rating: 2.5,
+    isFavorite: false,
+    favorites: new Set(),
+    reviews: [],
+    currentPage: 1,
+    audioCtx: null
   };
 
-  const fetchArtistFollowers = async (spotifyArtistId) => {
-    if (!spotifyArtistId) {
-      setSelectedArtistFollowers(0);
-      return;
-    }
-
-    try {
-      const res = await fetch(`https://soundboard-api-gyf6.onrender.com/api/favoritos/artista/${encodeURIComponent(spotifyArtistId)}`);
-      if (res.ok) {
-        const data = await res.json();
-        setSelectedArtistFollowers(data.seguidores ?? 0);
-      }
-    } catch (err) {
-      console.error('Error al obtener seguidores del artista:', err);
-      setSelectedArtistFollowers(0);
-    }
-  };
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchUserFavorites();
-    }
-  }, [isAuthenticated, user]);
-
-  useEffect(() => {
-    if (isArtistSelected && selectedItemId) {
-      fetchArtistFollowers(selectedItemId);
-    } else {
-      setSelectedArtistFollowers(0);
-    }
-  }, [isArtistSelected, selectedItemId]);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
-        setShowSuggestions(false);
-        setShowFilterOptions(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    fetchPublicReviews();
-  }, []);
-
-  const fetchPublicReviews = async () => {
-    setLoadingReviews(true);
-    try {
-      const res = await fetch('https://soundboard-api-gyf6.onrender.com/api/resenas');
-      if (res.ok) {
-        const data = await res.json();
-        setPublicReviews(Array.isArray(data) ? data : []);
-      }
-    } catch (err) {
-      console.error('Error cargando reseñas:', err);
-    } finally {
-      setLoadingReviews(false);
-    }
-  };
-
-  const executeSearch = async (queryText) => {
-    if (!queryText || queryText.trim().length === 0) {
-      setSuggestions([]);
-      setSearchResults([]);
-      setShowSuggestions(false);
-      return;
-    }
-
-    try {
-      const res = await fetch(
-        `https://soundboard-api-gyf6.onrender.com/api/spotify/buscar?q=${encodeURIComponent(queryText.trim())}`
-      );
-
-      if (res.ok) {
-        const data = await res.json();
-        const items = extractItemsFromSearchResponse(data);
-        setSearchResults(items);
-        setSuggestions(items.slice(0, 6));
-      }
-    } catch (err) {
-      console.error('Error al realizar búsqueda:', err);
-    }
-  };
-
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    setShowSuggestions(value.trim().length > 0);
-    executeSearch(value);
-  };
-
-  const handleSearchSubmit = (e) => {
-    if (e) e.preventDefault();
-    setShowSuggestions(false);
-    executeSearch(searchTerm);
-  };
-
-  const handleClearSearch = () => {
-    setSearchTerm('');
-    setSuggestions([]);
-    setSearchResults([]);
-    setShowSuggestions(false);
-  };
-
-  const handleSelectItem = (item) => {
-    setSelectedItem(item);
-    setShowSuggestions(false);
-    if (item.name || item.titulo || item.titulo_album) {
-      setSearchTerm(item.name || item.titulo || item.titulo_album);
-    }
-  };
-
-  const handleToggleFavorite = async (e) => {
-    e.stopPropagation();
-    if (!isArtistSelected || !selectedItemId) return;
-
-    const userId = getCurrentUserId();
-    if (!userId) {
-      setAlertMessage('Inicia sesión para guardar artistas favoritos.');
-      setAlertOpen(true);
-      return;
-    }
-
-    const artistId = selectedItemId;
-    const title = selectedItem.name || selectedItem.titulo || selectedItem.titulo_album || 'Artista';
-    const image = getItemImage(selectedItem);
-
-    try {
-      if (isFavorite) {
-        const res = await fetch(
-          `https://soundboard-api-gyf6.onrender.com/api/usuarios/${encodeURIComponent(userId)}/favoritos/${encodeURIComponent(artistId)}`,
-          { method: 'DELETE' }
-        );
-
-        if (res.ok) {
-          setFavoriteArtistIds((prev) => prev.filter((id) => id !== artistId));
-          await fetchUserFavorites();
-          await fetchArtistFollowers(artistId);
+  // ==========================================================================
+  // 2. SERVICIO DE AUDIO WEBAUDIO (Efectos de sonido Neón)
+  // ==========================================================================
+  class SoundEffects {
+    static init() {
+      if (!CONFIG.AUDIO_ENABLED) return;
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          state.audioCtx = new AudioContext();
         }
-      } else {
-        const res = await fetch(`https://soundboard-api-gyf6.onrender.com/api/usuarios/${encodeURIComponent(userId)}/favoritos`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ spotify_artist_id: artistId, nombre: title, imagen_url: image }),
+      } catch (e) {
+        console.warn('Web Audio API no soportado.');
+      }
+    }
+
+    static playClick() {
+      if (!state.audioCtx) return;
+      if (state.audioCtx.state === 'suspended') {
+        state.audioCtx.resume();
+      }
+      const osc = state.audioCtx.createOscillator();
+      const gain = state.audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, state.audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(200, state.audioCtx.currentTime + 0.05);
+      gain.gain.setValueAtTime(0.05, state.audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, state.audioCtx.currentTime + 0.05);
+      osc.connect(gain);
+      gain.connect(state.audioCtx.destination);
+      osc.start();
+      osc.stop(state.audioCtx.currentTime + 0.05);
+    }
+
+    static playPop() {
+      if (!state.audioCtx) return;
+      if (state.audioCtx.state === 'suspended') {
+        state.audioCtx.resume();
+      }
+      const osc = state.audioCtx.createOscillator();
+      const gain = state.audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(300, state.audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(900, state.audioCtx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.08, state.audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, state.audioCtx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(state.audioCtx.destination);
+      osc.start();
+      osc.stop(state.audioCtx.currentTime + 0.08);
+    }
+  }
+
+  // ==========================================================================
+  // 3. SISTEMA DE NOTIFICACIONES TOAST (UI Feedback)
+  // ==========================================================================
+  class ToastManager {
+    static container = null;
+
+    static init() {
+      if (!this.container) {
+        this.container = document.createElement('div');
+        this.container.id = 'neon-toast-container';
+        Object.assign(this.container.style, {
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          zIndex: '9999',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+          pointerEvents: 'none'
         });
-
-        if (res.ok) {
-          setFavoriteArtistIds((prev) => Array.from(new Set([...prev, artistId])));
-          await fetchUserFavorites();
-          await fetchArtistFollowers(artistId);
-        }
+        document.body.appendChild(this.container);
       }
-    } catch (err) {
-      console.error('Error al cambiar favorito:', err);
-    }
-  };
-
-  const handlePublish = async (e) => {
-    e.preventDefault();
-    if (!selectedItem) return;
-
-    const userId = getCurrentUserId();
-    if (!userId) {
-      setAlertMessage('Debes iniciar sesión para publicar una reseña.');
-      setAlertOpen(true);
-      return;
     }
 
-    setIsPublishing(true);
-    try {
-      const resolvedTitle = selectedItem.name || selectedItem.titulo || selectedItem.titulo_album || '';
-      const resolvedType = getTypeLabel(selectedItem);
-      const resolvedArtist = resolvedType === 'Artista' ? resolvedTitle : getItemArtist(selectedItem);
-      const resolvedImage = getItemImage(selectedItem);
-
-      const payload = {
-        usuario_id: userId,
-        spotify_album_id: selectedItem.id || selectedItem.spotify_album_id || selectedItem.uri || 'custom-id',
-        titulo_album: resolvedTitle,
-        artista: resolvedArtist,
-        imagen_url: resolvedImage,
-        tipo: resolvedType,
-        calificacion: rating,
-        comentario: comment.trim() || '',
+    static show(message, type = 'info') {
+      this.init();
+      const toast = document.createElement('div');
+      toast.className = `neon-toast neon-toast-${type}`;
+      
+      const colors = {
+        info: '#00d2ff',
+        success: '#34d399',
+        error: '#ff5f5f'
       };
 
-      const res = await fetch('https://soundboard-api-gyf6.onrender.com/api/resenas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+      Object.assign(toast.style, {
+        background: 'rgba(18, 22, 28, 0.95)',
+        border: `1px solid ${colors[type] || colors.info}`,
+        boxShadow: `0 8px 24px rgba(0, 0, 0, 0.5), 0 0 12px ${colors[type]}44`,
+        color: '#ffffff',
+        padding: '12px 20px',
+        borderRadius: '12px',
+        backdropFilter: 'blur(12px)',
+        fontSize: '0.88rem',
+        fontWeight: '600',
+        pointerEvents: 'auto',
+        opacity: '0',
+        transform: 'translateY(20px)',
+        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
       });
 
-      if (res.ok) {
-        setComment('');
-        setSelectedItem(null);
-        setSearchTerm('');
-        setSearchResults([]);
-        fetchPublicReviews();
+      toast.textContent = message;
+      this.container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+      });
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+  }
+
+  // ==========================================================================
+  // 4. STORAGE MANAGER (LOCAL STORAGE PERSISTENCE)
+  // ==========================================================================
+  class StorageManager {
+    static load() {
+      try {
+        const savedReviews = localStorage.getItem(CONFIG.STORAGE_KEYS.REVIEWS);
+        if (savedReviews) {
+          state.reviews = JSON.parse(savedReviews);
+        }
+
+        const savedFavorites = localStorage.getItem(CONFIG.STORAGE_KEYS.FAVORITES);
+        if (savedFavorites) {
+          state.favorites = new Set(JSON.parse(savedFavorites));
+        }
+      } catch (e) {
+        console.error('Error al cargar LocalStorage:', e);
       }
-    } catch (err) {
-      console.error('Error publicando reseña:', err);
-    } finally {
-      setIsPublishing(false);
+    }
+
+    static saveReviews() {
+      try {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.REVIEWS, JSON.stringify(state.reviews));
+      } catch (e) {
+        console.error('Error al guardar reseñas:', e);
+      }
+    }
+
+    static saveFavorites() {
+      try {
+        localStorage.setItem(
+          CONFIG.STORAGE_KEYS.FAVORITES,
+          JSON.stringify(Array.from(state.favorites))
+        );
+      } catch (e) {
+        console.error('Error al guardar favoritos:', e);
+      }
+    }
+  }
+
+  // ==========================================================================
+  // 5. HELPER UTILITIES
+  // ==========================================================================
+  const Utils = {
+    debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    },
+
+    escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, (tag) => {
+        const chars = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        };
+        return chars[tag] || tag;
+      });
+    },
+
+    formatTimeAgo(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const seconds = Math.floor((now - date) / 1000);
+
+      if (seconds < 60) return 'Hace un momento';
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `Hace ${minutes} min${minutes > 1 ? 's' : ''}`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `Hace ${hours} hora${hours > 1 ? 's' : ''}`;
+      const days = Math.floor(hours / 24);
+      return `Hace ${days} día${days > 1 ? 's' : ''}`;
     }
   };
 
-  const filterMatch = (item) => {
-    if (filterType === 'Todos') return true;
-    const label = getTypeLabel(item);
-    if (filterType === 'Álbumes') return label === 'Álbum';
-    if (filterType === 'Artistas') return label === 'Artista';
-    if (filterType === 'Canciones') return label === 'Canción';
-    return true;
-  };
+  // ==========================================================================
+  // 6. MODULE: DROPDOWN DE FILTROS & ACCESIBILIDAD
+  // ==========================================================================
+  class FilterDropdownModule {
+    constructor() {
+      this.wrapper = document.querySelector('.filter-dropdown-wrapper');
+      this.btn = document.querySelector('.filter-btn');
+      this.menu = document.querySelector('.filter-dropdown-menu');
+      this.items = document.querySelectorAll('.filter-item');
+      this.label = this.btn ? this.btn.querySelector('span:first-child') : null;
 
-  const filteredResults = searchResults.filter(filterMatch);
-  const filteredSuggestions = suggestions.filter(filterMatch);
+      this.init();
+    }
 
-  return (
-    <div className="review-page-container">
-      {/* Sección Superior: Búsqueda y Formulario */}
-      <section className="review-hero-section">
-        <div className="review-hero-grid">
-          
-          {/* Panel Izquierdo: Buscador y Resultados */}
-          <div className="review-search-panel">
-            <div className="search-box-wrapper" ref={searchContainerRef}>
-              <form className="search-bar-inner" onSubmit={handleSearchSubmit}>
-                
-                {/* Dropdown de Filtro (CORREGIDO POSICIONAMIENTO ABSOLUTO) */}
-                <div className="filter-dropdown-wrapper">
-                  <button
-                    type="button"
-                    className="filter-btn"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setShowFilterOptions((s) => !s);
-                    }}
-                  >
-                    <span>{filterType}</span>
-                    <span className="dropdown-arrow">▾</span>
-                  </button>
+    init() {
+      if (!this.btn || !this.menu) return;
 
-                  {showFilterOptions && (
-                    <div className="filter-dropdown-menu">
-                      {['Todos', 'Álbumes', 'Artistas', 'Canciones'].map((f) => (
-                        <button
-                          key={f}
-                          type="button"
-                          className={`filter-item ${filterType === f ? 'active' : ''}`}
-                          onClick={() => {
-                            setFilterType(f);
-                            setShowFilterOptions(false);
-                          }}
-                        >
-                          {f}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+      this.btn.setAttribute('aria-haspopup', 'true');
+      this.btn.setAttribute('aria-expanded', 'false');
 
-                <div className="search-divider" />
+      this.btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.toggle();
+      });
 
-                {/* Input Principal */}
-                <input
-                  type="text"
-                  className="search-input-field"
-                  placeholder="Buscar artista, canción o álbum..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                />
+      this.items.forEach((item) => {
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.select(item);
+        });
+      });
 
-                {searchTerm && (
-                  <button
-                    type="button"
-                    className="clear-search-btn"
-                    onClick={handleClearSearch}
-                    title="Borrar texto"
-                  >
-                    ✕
-                  </button>
-                )}
+      document.addEventListener('click', () => this.close());
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') this.close();
+      });
+    }
 
-                <button
-                  type="submit"
-                  className="search-submit-btn"
-                  title="Buscar"
-                >
-                  🔍
-                </button>
-              </form>
+    toggle() {
+      const isVisible = this.menu.style.display === 'flex';
+      if (isVisible) {
+        this.close();
+      } else {
+        this.open();
+      }
+    }
 
-              {/* Autocompletado */}
-              {showSuggestions && filteredSuggestions.length > 0 && (
-                <div className="autocomplete-dropdown">
-                  {filteredSuggestions.map((item, idx) => (
-                    <div
-                      key={item.id || idx}
-                      className="autocomplete-item"
-                      onClick={() => handleSelectItem(item)}
-                    >
-                      <div className="autocomplete-left">
-                        <img
-                          src={getItemImage(item)}
-                          alt={item.name || item.titulo || item.titulo_album}
-                          className="autocomplete-thumb"
-                        />
-                        <div className="autocomplete-info">
-                          <strong>{item.name || item.titulo || item.titulo_album}</strong>
-                          <span>{getItemArtist(item)}</span>
-                        </div>
-                      </div>
-                      <span className={`card-badge ${getBadgeClass(item)}`}>
-                        {getTypeLabel(item)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
+    open() {
+      SoundEffects.playClick();
+      this.menu.style.display = 'flex';
+      this.btn.setAttribute('aria-expanded', 'true');
+    }
+
+    close() {
+      if (this.menu) {
+        this.menu.style.display = 'none';
+        this.btn.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    select(item) {
+      this.items.forEach((i) => i.classList.remove('active'));
+      item.classList.add('active');
+
+      const text = item.textContent.trim();
+      state.activeFilter = text;
+
+      if (this.label) this.label.textContent = text;
+      this.close();
+
+      // Notificar al buscador
+      window.dispatchEvent(new CustomEvent('neon:filter-changed', { detail: { filter: text } }));
+      ToastManager.show(`Filtro aplicado: ${text}`, 'info');
+    }
+  }
+
+  // ==========================================================================
+  // 7. MODULE: BÚSQUEDA Y AUTOCOMPLETADO INTERACTIVO
+  // ==========================================================================
+  class SearchModule {
+    constructor() {
+      this.input = document.querySelector('.search-input-field');
+      this.clearBtn = document.querySelector('.clear-search-btn');
+      this.submitBtn = document.querySelector('.search-submit-btn');
+      this.autocomplete = document.querySelector('.autocomplete-dropdown');
+      this.resultsGrid = document.querySelector('.results-grid');
+
+      this.debouncedSearch = Utils.debounce(() => this.executeSearch(), CONFIG.DEBOUNCE_DELAY);
+      this.init();
+    }
+
+    init() {
+      if (!this.input) return;
+
+      this.input.addEventListener('input', () => this.debouncedSearch());
+
+      this.input.addEventListener('focus', () => {
+        if (this.input.value.trim().length > 0) {
+          this.executeSearch();
+        }
+      });
+
+      if (this.clearBtn) {
+        this.clearBtn.addEventListener('click', () => this.clear());
+      }
+
+      if (this.submitBtn) {
+        this.submitBtn.addEventListener('click', () => {
+          SoundEffects.playClick();
+          this.executeSearch();
+          this.hideAutocomplete();
+        });
+      }
+
+      window.addEventListener('neon:filter-changed', () => {
+        this.executeSearch();
+      });
+
+      // Primer renderizado con base de datos completa
+      this.renderResultsGrid(state.database);
+    }
+
+    clear() {
+      SoundEffects.playClick();
+      this.input.value = '';
+      state.searchQuery = '';
+      this.hideAutocomplete();
+      this.renderResultsGrid(state.database);
+      this.input.focus();
+    }
+
+    hideAutocomplete() {
+      if (this.autocomplete) {
+        this.autocomplete.style.display = 'none';
+      }
+    }
+
+    executeSearch() {
+      const query = this.input.value.trim().toLowerCase();
+      state.searchQuery = query;
+
+      let filtered = [...state.database];
+
+      // Aplicar filtro por categoría
+      if (state.activeFilter !== 'Todos') {
+        const typeMap = {
+          'Álbumes': 'album',
+          'Canciones': 'cancion',
+          'Artistas': 'artista'
+        };
+        const targetType = typeMap[state.activeFilter];
+        filtered = filtered.filter((item) => item.type === targetType);
+      }
+
+      // Aplicar búsqueda textual
+      if (query.length > 0) {
+        filtered = filtered.filter(
+          (item) =>
+            item.title.toLowerCase().includes(query) ||
+            item.artist.toLowerCase().includes(query) ||
+            (item.genre && item.genre.toLowerCase().includes(query))
+        );
+        this.renderAutocomplete(filtered);
+      } else {
+        this.hideAutocomplete();
+      }
+
+      this.renderResultsGrid(filtered);
+    }
+
+    renderAutocomplete(items) {
+      if (!this.autocomplete) return;
+
+      if (items.length === 0) {
+        this.hideAutocomplete();
+        return;
+      }
+
+      const sliced = items.slice(0, CONFIG.MAX_AUTOCOMPLETE_RESULTS);
+
+      this.autocomplete.innerHTML = sliced
+        .map(
+          (item) => `
+        <div class="autocomplete-item" data-id="${item.id}" role="option">
+          <div class="autocomplete-left">
+            <img src="${item.img}" alt="${Utils.escapeHTML(item.title)}" class="autocomplete-thumb" />
+            <div class="autocomplete-info">
+              <strong>${Utils.escapeHTML(item.title)}</strong>
+              <span>${Utils.escapeHTML(item.artist)}</span>
             </div>
+          </div>
+          <span class="card-badge ${item.badgeClass}">${item.badgeText}</span>
+        </div>
+      `
+        )
+        .join('');
 
-            {/* Grid de Resultados de Búsqueda */}
-            <div className="results-grid">
-              {filteredResults.map((item, idx) => {
-                const isSelected = selectedItem?.id === item.id;
-                return (
-                  <div
-                    key={item.id || idx}
-                    className={`result-card ${isSelected ? 'selected' : ''}`}
-                    onClick={() => handleSelectItem(item)}
-                  >
-                    <img
-                      src={getItemImage(item)}
-                      alt={item.name || item.titulo || item.titulo_album}
-                      className="result-card-img"
-                    />
-                    <div className="result-card-info">
-                      <div className="result-card-header">
-                        <h3>{item.name || item.titulo || item.titulo_album}</h3>
-                        <span className={`card-badge ${getBadgeClass(item)}`}>
-                          {getTypeLabel(item)}
-                        </span>
-                      </div>
-                      <p>{getItemArtist(item)}</p>
-                    </div>
-                  </div>
-                );
-              })}
+      this.autocomplete.style.display = 'block';
+
+      this.autocomplete.querySelectorAll('.autocomplete-item').forEach((el) => {
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = el.getAttribute('data-id');
+          const found = state.database.find((i) => i.id === id);
+          if (found) {
+            window.dispatchEvent(
+              new CustomEvent('neon:item-selected', { detail: { item: found } })
+            );
+          }
+          this.hideAutocomplete();
+        });
+      });
+    }
+
+    renderResultsGrid(items) {
+      if (!this.resultsGrid) return;
+
+      if (items.length === 0) {
+        this.resultsGrid.innerHTML = `
+          <div style="text-align: center; padding: 40px 10px; color: #64748b;">
+            <p style="margin: 0; font-size: 0.95rem;">No se encontraron resultados.</p>
+            <small style="color: #475569;">Intenta cambiar el término de búsqueda o el filtro.</small>
+          </div>
+        `;
+        return;
+      }
+
+      this.resultsGrid.innerHTML = items
+        .map((item) => {
+          const isSelected = state.selectedItem && state.selectedItem.id === item.id;
+          return `
+          <div class="result-card ${isSelected ? 'selected' : ''}" data-id="${item.id}">
+            <img src="${item.img}" alt="${Utils.escapeHTML(item.title)}" class="result-card-img" />
+            <div class="result-card-info">
+              <div class="result-card-header">
+                <h3>${Utils.escapeHTML(item.title)}</h3>
+                <span class="card-badge ${item.badgeClass}">${item.badgeText}</span>
+              </div>
+              <p>${Utils.escapeHTML(item.artist)}</p>
+            </div>
+          </div>
+        `;
+        })
+        .join('');
+
+      this.resultsGrid.querySelectorAll('.result-card').forEach((card) => {
+        card.addEventListener('click', () => {
+          const id = card.getAttribute('data-id');
+          const found = state.database.find((i) => i.id === id);
+          if (found) {
+            window.dispatchEvent(
+              new CustomEvent('neon:item-selected', { detail: { item: found } })
+            );
+          }
+        });
+      });
+    }
+  }
+
+  // ==========================================================================
+  // 8. MODULE: SELECCIÓN & PREVIEW FORMULARIO
+  // ==========================================================================
+  class PreviewFormModule {
+    constructor() {
+      this.previewCard = document.querySelector('.selected-preview-card');
+      this.previewImg = document.querySelector('.selected-preview-img');
+      this.previewTitle = document.querySelector('.selected-preview-info h4');
+      this.previewArtist = document.querySelector('.selected-preview-info p');
+      this.previewFollowers = document.querySelector('.artist-followers');
+      this.favoriteBtn = document.querySelector('.favorite-heart-btn');
+
+      this.init();
+    }
+
+    init() {
+      window.addEventListener('neon:item-selected', (e) => {
+        this.updateSelected(e.detail.item);
+      });
+
+      if (this.favoriteBtn) {
+        this.favoriteBtn.addEventListener('click', () => this.toggleFavorite());
+      }
+
+      // Render inicial con item por defecto
+      if (state.selectedItem) {
+        this.updateSelected(state.selectedItem, false);
+      }
+    }
+
+    updateSelected(item, triggerToast = true) {
+      state.selectedItem = item;
+      SoundEffects.playClick();
+
+      if (this.previewImg) this.previewImg.src = item.img;
+      if (this.previewTitle) this.previewTitle.textContent = item.title;
+      if (this.previewArtist) this.previewArtist.textContent = item.artist;
+      if (this.previewFollowers) this.previewFollowers.textContent = item.followers;
+
+      // Actualizar estado del corazón
+      const isFav = state.favorites.has(item.id);
+      state.isFavorite = isFav;
+      this.syncFavoriteUI();
+
+      // Notificar al módulo de lista de búsqueda
+      window.dispatchEvent(new CustomEvent('neon:state-updated'));
+
+      if (triggerToast) {
+        ToastManager.show(`Seleccionado: ${item.title}`, 'info');
+      }
+    }
+
+    toggleFavorite() {
+      if (!state.selectedItem) return;
+
+      const id = state.selectedItem.id;
+      if (state.favorites.has(id)) {
+        state.favorites.delete(id);
+        state.isFavorite = false;
+        ToastManager.show('Eliminado de tus favoritos', 'info');
+      } else {
+        state.favorites.add(id);
+        state.isFavorite = true;
+        SoundEffects.playPop();
+        ToastManager.show('¡Añadido a tus favoritos!', 'success');
+      }
+
+      StorageManager.saveFavorites();
+      this.syncFavoriteUI();
+    }
+
+    syncFavoriteUI() {
+      if (!this.favoriteBtn) return;
+      if (state.isFavorite) {
+        this.favoriteBtn.classList.add('is-favorite');
+      } else {
+        this.favoriteBtn.classList.remove('is-favorite');
+      }
+    }
+  }
+
+  // ==========================================================================
+  // 9. MODULE: STAR RATING INTERACTIVO CON PRECISIÓN DUAL (MEDIAS ESTRELLAS)
+  // ==========================================================================
+  class RatingModule {
+    constructor() {
+      this.container = document.querySelector('.star-rating-container');
+      this.starBtns = document.querySelectorAll('.star-rating-container .star-btn');
+      this.init();
+    }
+
+    init() {
+      if (!this.container || this.starBtns.length === 0) return;
+
+      this.starBtns.forEach((btn, index) => {
+        btn.addEventListener('mousemove', (e) => this.handleHover(e, index));
+        btn.addEventListener('click', (e) => this.handleClick(e, index));
+      });
+
+      this.container.addEventListener('mouseleave', () => {
+        this.render(state.rating);
+      });
+
+      // Render inicial
+      this.render(state.rating);
+    }
+
+    calculateValue(e, index) {
+      const btn = this.starBtns[index];
+      const rect = btn.getBoundingClientRect();
+      const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+      const isHalf = clientX - rect.left < rect.width / 2;
+      return index + (isHalf ? 0.5 : 1.0);
+    }
+
+    handleHover(e, index) {
+      const hoverVal = this.calculateValue(e, index);
+      this.render(hoverVal);
+    }
+
+    handleClick(e, index) {
+      const clickedVal = this.calculateValue(e, index);
+      state.rating = clickedVal;
+      SoundEffects.playClick();
+      this.render(state.rating);
+      ToastManager.show(`Calificación: ${state.rating} estrellas`, 'info');
+    }
+
+    render(value) {
+      this.starBtns.forEach((btn, index) => {
+        const starVal = index + 1;
+        btn.classList.remove('full', 'half');
+
+        if (value >= starVal) {
+          btn.classList.add('full');
+        } else if (value >= starVal - 0.5) {
+          btn.classList.add('half');
+        }
+      });
+    }
+  }
+
+  // ==========================================================================
+  // 10. MODULE: REVIEW FORM & FEED CREATOR
+  // ==========================================================================
+  class ReviewFormModule {
+    constructor() {
+      this.textarea = document.querySelector('.review-textarea');
+      this.submitBtn = document.querySelector('.review-submit-btn');
+      this.feedGrid = document.querySelector('.review-cards-grid');
+
+      this.init();
+    }
+
+    init() {
+      if (!this.submitBtn) return;
+
+      this.submitBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.submit();
+      });
+
+      // Cargar reseñas previas almacenadas
+      this.renderAllReviews();
+    }
+
+    submit() {
+      if (!this.textarea) return;
+
+      const comment = this.textarea.value.trim();
+
+      if (!comment) {
+        ToastManager.show('Escribe una opinión antes de publicar.', 'error');
+        this.textarea.focus();
+        return;
+      }
+
+      if (comment.length < 5) {
+        ToastManager.show('Tu opinión debe tener al menos 5 caracteres.', 'error');
+        return;
+      }
+
+      if (!state.selectedItem) {
+        ToastManager.show('Por favor selecciona una obra.', 'error');
+        return;
+      }
+
+      const newReview = {
+        id: 'rev-' + Date.now(),
+        itemId: state.selectedItem.id,
+        itemTitle: state.selectedItem.title,
+        itemArtist: state.selectedItem.artist,
+        itemImg: state.selectedItem.img,
+        badgeClass: state.selectedItem.badgeClass,
+        badgeText: state.selectedItem.badgeText,
+        rating: state.rating,
+        comment: comment,
+        author: 'Usuario Neón',
+        createdAt: new Date().toISOString()
+      };
+
+      state.reviews.unshift(newReview);
+      StorageManager.saveReviews();
+
+      SoundEffects.playPop();
+      ToastManager.show('¡Reseña publicada con éxito!', 'success');
+
+      // Limpieza de campo
+      this.textarea.value = '';
+      state.rating = 5.0;
+      window.dispatchEvent(new CustomEvent('neon:rating-reset'));
+
+      // Re-render feed
+      this.renderAllReviews();
+    }
+
+    renderAllReviews() {
+      if (!this.feedGrid) return;
+
+      if (state.reviews.length === 0) {
+        // Mantener contenido demo estático si no hay reseñas guardadas en localStorage
+        return;
+      }
+
+      const cardsHTML = state.reviews
+        .map((rev) => this.generateCardHTML(rev))
+        .join('');
+
+      this.feedGrid.innerHTML = cardsHTML;
+    }
+
+    generateCardHTML(rev) {
+      let starsHTML = '';
+      for (let i = 1; i <= 5; i++) {
+        if (rev.rating >= i) {
+          starsHTML += `<span class="neon-star full">★</span>`;
+        } else {
+          starsHTML += `<span class="neon-star">★</span>`;
+        }
+      }
+
+      return `
+        <article class="feed-review-card" id="${rev.id}">
+          <div class="feed-card-header">
+            <img src="${rev.itemImg}" alt="${Utils.escapeHTML(rev.itemTitle)}" class="feed-card-thumb" />
+            <div class="feed-card-item-info">
+              <h3 class="feed-item-title">${Utils.escapeHTML(rev.itemTitle)}</h3>
+              <p class="feed-item-artist">de <strong>${Utils.escapeHTML(rev.itemArtist)}</strong></p>
+              <span class="card-badge ${rev.badgeClass}">${rev.badgeText}</span>
             </div>
           </div>
 
-          {/* Panel Derecho: Formulario de Reseña */}
-          <div className="review-form-panel">
-            <h3 className="form-title">Escribir Reseña</h3>
-
-            {selectedItem ? (
-              <div className="selected-preview-card">
-                <div className="selected-preview-content">
-                  <img
-                    src={getItemImage(selectedItem)}
-                    alt={selectedItem.name || selectedItem.titulo || selectedItem.titulo_album}
-                    className="selected-preview-img"
-                  />
-                  <div className="selected-preview-info">
-                    <span className={`card-badge ${getBadgeClass(selectedItem)}`}>
-                      {getTypeLabel(selectedItem)}
-                    </span>
-                    <h4>{selectedItem.name || selectedItem.titulo || selectedItem.titulo_album}</h4>
-                    <p>{getItemArtist(selectedItem)}</p>
-                    {getTypeLabel(selectedItem) === 'Artista' && (
-                      <p className="artist-followers">
-                        {selectedArtistFollowers.toLocaleString()} seguidores
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {getTypeLabel(selectedItem) === 'Artista' && (
-                  <button
-                    type="button"
-                    className={`favorite-heart-btn ${isFavorite ? 'is-favorite' : ''}`}
-                    onClick={handleToggleFavorite}
-                    title={isFavorite ? 'Quitar de favoritos' : 'Guardar artista favorito'}
-                    aria-label={isFavorite ? 'Artista favorito' : 'Marcar como favorito'}
-                  >
-                    ♥
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className="selected-placeholder">
-                <p>Busca y selecciona un álbum, canción o artista para comenzar tu reseña.</p>
-              </div>
-            )}
-
-            {/* Sistema de Calificación con Estrellas (RESTAURADO NEÓN) */}
-            <div className="rating-selector-group">
-              <label className="rating-label">Calificación:</label>
-              <div className="star-rating-container">
-                {[1, 2, 3, 4, 5].map((i) => {
-                  const isFull = rating >= i;
-                  const isHalf = rating === i - 0.5;
-                  return (
-                    <button
-                      key={i}
-                      type="button"
-                      className={`star-btn ${isFull ? 'full' : ''} ${isHalf ? 'half' : ''}`}
-                      onClick={() => setRating(rating === i ? i - 0.5 : i)}
-                      title={`${i} estrellas`}
-                    >
-                      <span className="star-back">★</span>
-                      <span className="star-front">★</span>
-                    </button>
-                  );
-                })}
-              </div>
+          <div class="feed-card-body">
+            <div class="feed-rating-stars">
+              ${starsHTML}
+              <span class="rating-number">${Number(rev.rating).toFixed(1)}</span>
             </div>
-
-            {/* Campo de Comentario */}
-            <textarea
-              className="review-textarea"
-              placeholder="¿Qué te pareció este lanzamiento? Escribe tu reseña... (Opcional)"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            />
-
-            <button
-              type="button"
-              className="review-submit-btn"
-              disabled={!selectedItem || isPublishing}
-              onClick={handlePublish}
-            >
-              {isPublishing ? 'Publicando...' : 'Publicar Reseña'}
-            </button>
+            <p class="feed-comment">"${Utils.escapeHTML(rev.comment)}"</p>
           </div>
 
-        </div>
-      </section>
+          <footer class="feed-card-meta">
+            <span>Por <strong>${Utils.escapeHTML(rev.author)}</strong></span>
+            <time datetime="${rev.createdAt}">${Utils.formatTimeAgo(rev.createdAt)}</time>
+          </footer>
+        </article>
+      `;
+    }
+  }
 
-      {/* Sección Inferior: Feed de Reseñas */}
-      <section className="review-feed-section">
-        <div className="review-section-header">
-          <h2>Reseñas en tendencia</h2>
-          <p>Opiniones y comentarios creados recientemente por la comunidad de SoundBoard.</p>
-        </div>
+  // ==========================================================================
+  // 11. INITIALIZATION BOOTSTRAPPER
+  // ==========================================================================
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Cargar persistencia
+    StorageManager.load();
 
-        <div className="review-cards-grid">
-          {loadingReviews ? (
-            <p className="feed-loading-text">Cargando opiniones...</p>
-          ) : publicReviews.length > 0 ? (
-            publicReviews.map((rev, idx) => {
-              const itemTypeLabel = getTypeLabel(rev);
-              const artistName = getItemArtist(rev);
-              const formattedCreatedDate = formatDate(rev.fecha_creacion || rev.created_at);
-              const numCalificacion = Number(rev.calificacion) || 0;
+    // 2. Inicializar subsistemas
+    SoundEffects.init();
+    ToastManager.init();
 
-              return (
-                <article key={rev.id || idx} className="feed-review-card">
-                  <div className="feed-card-header">
-                    <img
-                      src={getItemImage(rev)}
-                      alt={rev.titulo_album || rev.titulo || 'Música'}
-                      className="feed-card-thumb"
-                    />
-                    <div className="feed-card-item-info">
-                      <span className={`card-badge ${getBadgeClass(rev)}`}>
-                        {itemTypeLabel}
-                      </span>
-                      <h3 className="feed-item-title">{rev.titulo_album || rev.titulo || rev.name}</h3>
-                      {artistName && itemTypeLabel !== 'Artista' && artistName !== 'Artista principal' && (
-                        <p className="feed-item-artist">
-                          de <strong>{artistName}</strong>
-                        </p>
-                      )}
-                    </div>
-                  </div>
+    // 3. Inicializar módulos UI
+    const filterDropdown = new FilterDropdownModule();
+    const searchModule = new SearchModule();
+    const previewForm = new PreviewFormModule();
+    const ratingModule = new RatingModule();
+    const reviewForm = new ReviewFormModule();
 
-                  <div className="feed-card-body">
-                    {/* Estilo de estrellas de neón restaurado */}
-                    <div className="feed-rating-stars">
-                      {[1, 2, 3, 4, 5].map((i) => (
-                        <span key={i} className={`neon-star ${numCalificacion >= i ? 'full' : ''}`}>
-                          ★
-                        </span>
-                      ))}
-                      <span className="rating-number">({numCalificacion.toFixed(1)})</span>
-                    </div>
-                    {rev.comentario && <p className="feed-comment">"{rev.comentario}"</p>}
-                  </div>
+    // Eventos globales adicionales
+    window.addEventListener('neon:state-updated', () => {
+      searchModule.executeSearch();
+    });
 
-                  <div className="feed-card-meta">
-                    <span>Reseña por <strong>{rev.autor || rev.usuario_nombre || `Usuario #${rev.usuario_id}`}</strong></span>
-                    {formattedCreatedDate && (
-                      <span className="feed-card-date">
-                        {formattedCreatedDate}
-                      </span>
-                    )}
-                  </div>
-                </article>
-              );
-            })
-          ) : (
-            <p className="feed-empty-text">
-              Aún no hay reseñas. ¡Sé el primero en compartir tu opinión arriba!
-            </p>
-          )}
-        </div>
-      </section>
+    window.addEventListener('neon:rating-reset', () => {
+      ratingModule.render(state.rating);
+    });
 
-      <ConfirmModal
-        open={alertOpen}
-        title="Aviso"
-        message={alertMessage}
-        confirmText="Aceptar"
-        cancelText="Cerrar"
-        onConfirm={() => setAlertOpen(false)}
-        onCancel={() => setAlertOpen(false)}
-      />
+    // Permitir inicializar el audio tras la primera interacción del usuario
+    const unlockAudio = () => {
+      if (state.audioCtx && state.audioCtx.state === 'suspended') {
+        state.audioCtx.resume();
+      }
+      document.removeEventListener('click', unlockAudio);
+      document.removeEventListener('keydown', unlockAudio);
+    };
 
-      <Footer />
-    </div>
-  );
-}
-
-export default Review;
+    document.addEventListener('click', unlockAudio);
+    document.addEventListener('keydown', unlockAudio);
+  });
+})();

@@ -1,27 +1,120 @@
 /* ==========================================================================
-   REVIEW PAGE - DESIGN SYSTEM MODULAR ( Glass-Cyan Neon Style )
+   DESIGN SYSTEM: GLASS-CYAN NEON (COMPLETE PRODUCTION STYLESHEET)
    ========================================================================== */
 
-/* Contenedor Principal con Fondo de Concierto y Overlay Gradiente Azul */
+/* --------------------------------------------------------------------------
+   1. CSS CUSTOM PROPERTIES / DESIGN TOKENS
+   -------------------------------------------------------------------------- */
+:root {
+  /* Color Palette */
+  --bg-dark-base: #050810;
+  --bg-dark-overlay-top: rgba(8, 12, 22, 0.85);
+  --bg-dark-overlay-bottom: rgba(5, 8, 16, 0.97);
+  --panel-bg: rgba(13, 20, 32, 0.72);
+  --panel-bg-hover: rgba(18, 28, 45, 0.82);
+  --search-bar-bg: rgba(8, 14, 26, 0.85);
+  --search-bar-focus: rgba(12, 22, 40, 0.95);
+  
+  /* Accent & Neon Colors */
+  --cyan-glow: #00d2ff;
+  --cyan-accent: #36a6ff;
+  --cyan-subtle: rgba(54, 166, 255, 0.18);
+  --cyan-border: rgba(54, 166, 255, 0.22);
+  --cyan-hover-border: rgba(54, 166, 255, 0.32);
+  
+  /* Text Colors */
+  --text-primary: #ffffff;
+  --text-heading: #f7fbff;
+  --text-body: #d7e2f8;
+  --text-muted: #8fa6d2;
+  --text-dim: #64748b;
+
+  /* Badges & Accents */
+  --badge-album-bg: rgba(54, 166, 255, 0.15);
+  --badge-album-text: #36a6ff;
+  --badge-cancion-bg: rgba(168, 85, 247, 0.15);
+  --badge-cancion-text: #c084fc;
+  --badge-artista-bg: rgba(16, 185, 129, 0.15);
+  --badge-artista-text: #34d399;
+  --heart-active: #ff5f5f;
+  --star-yellow: #ffc107;
+
+  /* Elevation & Glassmorphism */
+  --backdrop-blur-panel: blur(20px);
+  --backdrop-blur-dropdown: blur(24px);
+  --panel-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --panel-shadow-hover: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 25px rgba(54, 166, 255, 0.08);
+  --border-radius-main: 28px;
+  --border-radius-card: 16px;
+  --border-radius-pill: 999px;
+
+  /* Animations */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+  --transition-smooth: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --------------------------------------------------------------------------
+   2. GLOBAL RESET & BASE STYLES
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-dark-base);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(5, 8, 16, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(54, 166, 255, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   3. MAIN CONTAINER & HERO LAYOUT
+   -------------------------------------------------------------------------- */
 .review-page-container {
   position: relative;
   width: 100%;
   min-height: 100vh;
-  /* Fondo de fotografía con overlay gradiente azul/cian */
   background: 
     radial-gradient(circle at 50% 0%, rgba(14, 116, 144, 0.28) 0%, transparent 65%),
-    linear-gradient(180deg, rgba(8, 12, 22, 0.85) 0%, rgba(5, 8, 16, 0.97) 100%),
+    linear-gradient(180deg, var(--bg-dark-overlay-top) 0%, var(--bg-dark-overlay-bottom) 100%),
     url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=2000&q=80') center/cover no-repeat fixed;
   padding: 32px 24px 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 48px;
-  box-sizing: border-box;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
-/* Hero Section Grid */
 .review-hero-section {
   width: min(1380px, 100%);
   margin: 0 auto;
@@ -34,26 +127,28 @@
   align-items: stretch;
 }
 
-/* Paneles de Cristal (Glassmorphism Dark Cyan) */
+/* Glassmorphism Panel Base */
 .review-search-panel,
 .review-form-panel {
-  /* Fondo oscuro traslúcido con borde cian tenue */
-  background: rgba(13, 20, 32, 0.72);
-  border: 1px solid rgba(54, 166, 255, 0.18);
-  border-radius: 28px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  background: var(--panel-bg);
+  border: 1px solid var(--cyan-subtle);
+  border-radius: var(--border-radius-main);
+  box-shadow: var(--panel-shadow);
+  backdrop-filter: var(--backdrop-blur-panel);
+  -webkit-backdrop-filter: var(--backdrop-blur-panel);
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth), background var(--transition-smooth);
+  will-change: transform;
 }
 
 .review-search-panel:hover,
 .review-form-panel:hover {
-  border-color: rgba(54, 166, 255, 0.32);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 25px rgba(54, 166, 255, 0.08);
+  border-color: var(--cyan-hover-border);
+  box-shadow: var(--panel-shadow-hover);
 }
 
-/* Panel Izquierdo: Buscador */
+/* --------------------------------------------------------------------------
+   4. LEFT PANEL: SEARCH & RESULTS
+   -------------------------------------------------------------------------- */
 .review-search-panel {
   padding: 32px;
   display: flex;
@@ -72,22 +167,19 @@
   align-items: center;
   width: 100%;
   padding: 8px 18px;
-  border-radius: 999px;
-  background: rgba(8, 14, 26, 0.85);
-  border: 1px solid rgba(54, 166, 255, 0.22);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-sizing: border-box;
+  border-radius: var(--border-radius-pill);
+  background: var(--search-bar-bg);
+  border: 1px solid var(--cyan-border);
+  transition: all var(--transition-normal) cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .search-bar-inner:focus-within {
-  border-color: #00d2ff;
-  background: rgba(12, 22, 40, 0.95);
+  border-color: var(--cyan-glow);
+  background: var(--search-bar-focus);
   box-shadow: 0 0 0 4px rgba(0, 210, 255, 0.15), 0 0 20px rgba(0, 210, 255, 0.2);
 }
 
-/* --------------------------------------------------------------------------
-   Dropdown Filtro (CORRECCIÓN POSICIONAMIENTO ABSOLUTO)
-   -------------------------------------------------------------------------- */
+/* Filter Dropdown */
 .filter-dropdown-wrapper {
   position: relative;
 }
@@ -97,29 +189,34 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #cce3ff;
   padding: 8px 14px;
-  border-radius: 999px;
+  border-radius: var(--border-radius-pill);
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 0.85rem;
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
+  user-select: none;
 }
 
 .filter-btn:hover {
-  background: rgba(54, 166, 255, 0.15);
+  background: var(--cyan-subtle);
   border-color: rgba(54, 166, 255, 0.4);
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .dropdown-arrow {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--text-dim);
+  transition: transform var(--transition-normal);
+}
+
+.filter-btn[aria-expanded="true"] .dropdown-arrow {
+  transform: rotate(180deg);
 }
 
 .filter-dropdown-menu {
-  /* Posicionamiento absoluto para no mover el panel */
   position: absolute;
   top: calc(100% + 10px);
   left: 0;
@@ -128,8 +225,8 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: var(--backdrop-blur-panel);
+  -webkit-backdrop-filter: var(--backdrop-blur-panel);
   z-index: 600;
   padding: 6px;
   display: flex;
@@ -146,13 +243,14 @@
   border-radius: 10px;
   cursor: pointer;
   font-size: 0.88rem;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .filter-item:hover,
 .filter-item.active {
-  background: rgba(54, 166, 255, 0.18);
-  color: #ffffff;
+  background: var(--cyan-subtle);
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 .search-divider {
@@ -167,51 +265,51 @@
   padding: 10px 6px;
   background: transparent;
   border: none;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 0.95rem;
   outline: none;
 }
 
 .search-input-field::placeholder {
-  color: #64748b;
+  color: var(--text-dim);
 }
 
 .clear-search-btn {
   background: transparent;
   border: none;
-  color: #64748b;
+  color: var(--text-dim);
   font-size: 1.1rem;
   cursor: pointer;
   padding: 4px 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.15s ease;
+  transition: color var(--transition-fast);
 }
 
 .clear-search-btn:hover {
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .search-submit-btn {
   background: transparent;
   border: none;
-  color: #38bdf8;
+  color: var(--cyan-accent);
   font-size: 1.15rem;
   cursor: pointer;
   padding: 6px 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition: transform var(--transition-normal), color var(--transition-normal);
 }
 
 .search-submit-btn:hover {
-  color: #00d2ff;
+  color: var(--cyan-glow);
   transform: scale(1.15);
 }
 
-/* Desplegable Autocomplete */
+/* Autocomplete Dropdown */
 .autocomplete-dropdown {
   position: absolute;
   top: calc(100% + 12px);
@@ -221,7 +319,8 @@
   background: rgba(18, 22, 28, 0.98);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
-  backdrop-filter: blur(24px);
+  backdrop-filter: var(--backdrop-blur-dropdown);
+  -webkit-backdrop-filter: var(--backdrop-blur-dropdown);
   max-height: 380px;
   overflow-y: auto;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
@@ -236,7 +335,7 @@
   gap: 14px;
   color: #e9efff;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background var(--transition-fast);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
@@ -245,7 +344,7 @@
 }
 
 .autocomplete-item:hover {
-  background: rgba(54, 166, 255, 0.18);
+  background: var(--cyan-subtle);
 }
 
 .autocomplete-left {
@@ -271,7 +370,7 @@
 }
 
 .autocomplete-info strong {
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 0.95rem;
   white-space: nowrap;
   overflow: hidden;
@@ -279,14 +378,14 @@
 }
 
 .autocomplete-info span {
-  color: #8fa6d2;
+  color: var(--text-muted);
   font-size: 0.82rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Badges / Etiquetas (Corrección Ancho Contenido) */
+/* Badges */
 .card-badge {
   display: inline-flex;
   align-items: center;
@@ -303,26 +402,26 @@
 
 .card-badge.badge-album,
 .card-badge.album {
-  background: rgba(54, 166, 255, 0.15);
-  color: #36a6ff;
+  background: var(--badge-album-bg);
+  color: var(--badge-album-text);
   border: 1px solid rgba(54, 166, 255, 0.35);
 }
 
 .card-badge.badge-cancion,
 .card-badge.cancion {
-  background: rgba(168, 85, 247, 0.15);
-  color: #c084fc;
+  background: var(--badge-cancion-bg);
+  color: var(--badge-cancion-text);
   border: 1px solid rgba(168, 85, 247, 0.35);
 }
 
 .card-badge.badge-artista,
 .card-badge.artista {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
+  background: var(--badge-artista-bg);
+  color: var(--badge-artista-text);
   border: 1px solid rgba(16, 185, 129, 0.35);
 }
 
-/* Resultados de Búsqueda */
+/* Search Results Grid */
 .results-grid {
   display: flex;
   flex-direction: column;
@@ -332,17 +431,8 @@
   padding-right: 6px;
 }
 
-.results-grid::-webkit-scrollbar {
-  width: 6px;
-}
-
-.results-grid::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
-}
-
 .result-card {
-  border-radius: 16px;
+  border-radius: var(--border-radius-card);
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.03);
   padding: 12px 18px;
@@ -351,7 +441,7 @@
   align-items: center;
   gap: 16px;
   cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  transition: transform var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
 }
 
 .result-card:hover {
@@ -361,8 +451,8 @@
 }
 
 .result-card.selected {
-  border-color: #36a6ff;
-  background: rgba(54, 166, 255, 0.15);
+  border-color: var(--cyan-accent);
+  background: var(--cyan-subtle);
   box-shadow: 0 0 15px rgba(0, 210, 255, 0.15);
 }
 
@@ -395,7 +485,7 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: #f7fbff;
+  color: var(--text-heading);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -410,7 +500,9 @@
   text-overflow: ellipsis;
 }
 
-/* Panel Derecho: Formulario */
+/* --------------------------------------------------------------------------
+   5. RIGHT PANEL: REVIEW FORM & RATING
+   -------------------------------------------------------------------------- */
 .review-form-panel {
   padding: 32px;
   display: flex;
@@ -420,11 +512,12 @@
 
 .form-title {
   margin: 0;
-  color: #f7fbff;
+  color: var(--text-heading);
   font-size: 1.35rem;
+  font-weight: 700;
 }
 
-/* Vista Previa Seleccionada + Corazón de Favorito */
+/* Selected Preview Card & Heart Button */
 .selected-preview-card {
   display: flex;
   align-items: center;
@@ -461,7 +554,7 @@
 
 .selected-preview-info h4 {
   margin: 0;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 1rem;
   white-space: nowrap;
   overflow: hidden;
@@ -494,7 +587,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition: transform var(--transition-normal), color var(--transition-normal);
   user-select: none;
   flex-shrink: 0;
 }
@@ -505,13 +598,11 @@
 }
 
 .favorite-heart-btn.is-favorite {
-  color: #ff5f5f;
+  color: var(--heart-active);
   animation: heartPop 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-/* --------------------------------------------------------------------------
-   Estrellas de Calificación (Buzón)
-   -------------------------------------------------------------------------- */
+/* Star Rating Selector Group */
 .rating-selector-group {
   display: flex;
   flex-direction: column;
@@ -519,8 +610,9 @@
 }
 
 .rating-label {
-  color: #d7e2f8;
+  color: var(--text-body);
   font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .star-rating-container {
@@ -560,10 +652,11 @@
 }
 
 .rating-selector-group .star-front {
-  color: #ffc107;
+  color: var(--star-yellow);
   width: 0%;
   overflow: hidden;
   white-space: nowrap;
+  transition: width 0.1s linear;
 }
 
 .rating-selector-group .star-btn.full .star-front {
@@ -574,6 +667,7 @@
   width: 50%;
 }
 
+/* Textarea & Submit Button */
 .review-textarea {
   width: 100%;
   min-height: 120px;
@@ -581,16 +675,16 @@
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  color: var(--text-primary);
   font-family: inherit;
   font-size: 0.95rem;
   resize: vertical;
   outline: none;
-  box-sizing: border-box;
+  transition: border-color var(--transition-normal);
 }
 
 .review-textarea:focus {
-  border-color: #36a6ff;
+  border-color: var(--cyan-accent);
 }
 
 .review-submit-btn {
@@ -600,15 +694,15 @@
   gap: 10px;
   width: 100%;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--border-radius-pill);
   padding: 16px 28px;
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
   background: linear-gradient(135deg, #00d2ff 0%, #0072ff 100%);
-  color: #ffffff;
+  color: var(--text-primary);
   box-shadow: 0 16px 34px rgba(54, 166, 255, 0.18);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal), opacity var(--transition-normal);
   user-select: none;
 }
 
@@ -623,7 +717,9 @@
   transform: none !important;
 }
 
-/* Sección Inferior: Feed de Reseñas */
+/* --------------------------------------------------------------------------
+   6. LOWER SECTION: REVIEWS FEED
+   -------------------------------------------------------------------------- */
 .review-feed-section {
   width: min(1380px, 100%);
   margin: 0 auto;
@@ -640,8 +736,9 @@
 
 .review-section-header h2 {
   margin: 0;
-  color: #f8fbff;
+  color: var(--text-heading);
   font-size: clamp(1.85rem, 2.5vw, 2.4rem);
+  font-weight: 700;
 }
 
 .review-section-header p {
@@ -657,18 +754,20 @@
 }
 
 .feed-review-card {
-  border-radius: 28px;
+  border-radius: var(--border-radius-main);
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.04);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16);
   backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   padding: 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 18px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal), border-color var(--transition-normal);
+  will-change: transform;
 }
 
 .feed-review-card:hover {
@@ -702,7 +801,7 @@
 
 .feed-item-title {
   margin: 0;
-  color: #f7fbff;
+  color: var(--text-heading);
   font-size: 1.05rem;
   font-weight: 700;
   white-space: nowrap;
@@ -720,7 +819,7 @@
 }
 
 .feed-item-artist strong {
-  color: #d7e2f8;
+  color: var(--text-body);
 }
 
 .feed-card-body {
@@ -729,9 +828,7 @@
   gap: 10px;
 }
 
-/* --------------------------------------------------------------------------
-   ESTRELLAS DE NEÓN (FEED) - RESTAURADAS
-   -------------------------------------------------------------------------- */
+/* Neon Feed Stars */
 .feed-rating-stars {
   font-size: 1rem;
   display: flex;
@@ -740,19 +837,19 @@
 }
 
 .neon-star {
-  color: rgba(255, 255, 255, 0.1); /* Relleno tenue */
-  -webkit-text-stroke: 1px rgba(56, 189, 248, 0.3); /* Contorno neón cian tenue */
-  transition: all 0.2s ease;
+  color: rgba(255, 255, 255, 0.1);
+  -webkit-text-stroke: 1px rgba(56, 189, 248, 0.3);
+  transition: all var(--transition-normal);
 }
 
 .neon-star.full {
-  color: rgba(56, 189, 248, 0.1); /* Relleno cian muy sutil */
-  -webkit-text-stroke: 1px #00d2ff; /* Contorno neón cian brillante */
-  text-shadow: 0 0 8px rgba(0, 210, 255, 0.3), 0 0 15px rgba(0, 210, 255, 0.1); /* Brillo neón */
+  color: rgba(56, 189, 248, 0.1);
+  -webkit-text-stroke: 1px var(--cyan-glow);
+  text-shadow: 0 0 8px rgba(0, 210, 255, 0.3), 0 0 15px rgba(0, 210, 255, 0.1);
 }
 
 .feed-rating-stars .rating-number {
-  color: #36a6ff;
+  color: var(--cyan-accent);
   font-weight: 700;
   font-size: 0.9rem;
   margin-left: 4px;
@@ -760,12 +857,13 @@
 
 .feed-comment {
   margin: 0;
-  color: #d7e2f8;
+  color: var(--text-body);
   line-height: 1.6;
   font-size: 0.95rem;
   font-style: italic;
   display: -webkit-box;
   -webkit-line-clamp: 4;
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -784,14 +882,18 @@
   color: #e9efff;
 }
 
-/* Animaciones */
+/* --------------------------------------------------------------------------
+   7. KEYFRAMES & ANIMATIONS
+   -------------------------------------------------------------------------- */
 @keyframes heartPop {
   0% { transform: scale(0.8); }
   50% { transform: scale(1.35); }
   100% { transform: scale(1); }
 }
 
-/* Responsividad */
+/* --------------------------------------------------------------------------
+   8. MEDIA QUERIES & RESPONSIVENESS
+   -------------------------------------------------------------------------- */
 @media (max-width: 1200px) {
   .review-hero-grid {
     grid-template-columns: 1fr;
@@ -799,11 +901,36 @@
 }
 
 @media (max-width: 640px) {
-  .review-panel,
-  .review-form-panel {
-    padding: 24px;
+  .review-page-container {
+    padding: 20px 14px 60px;
+    gap: 32px;
   }
+
+  .review-search-panel,
+  .review-form-panel {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .search-bar-inner {
+    padding: 6px 12px;
+  }
+
+  .search-divider {
+    margin: 0 6px;
+  }
+
+  .filter-btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
   .review-cards-grid {
     grid-template-columns: 1fr;
+  }
+
+  .feed-review-card {
+    padding: 18px;
+    border-radius: 20px;
   }
 }
