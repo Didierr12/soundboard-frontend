@@ -1,0 +1,72 @@
+.cm-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(4,6,12,0.45);
+  z-index: 9999;
+  /* keep page scrollable under the overlay but visually dimmed */
+}
+
+.cm-dialog{
+  position: fixed;
+  left: 50%;
+  /* center exactly in the viewport regardless of scroll */
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(640px, calc(100% - 48px));
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  padding: 18px;
+  border-radius: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+
+.cm-icon{
+  flex: 0 0 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #ff6b6b, #ffb36b);
+  color: white;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+}
+
+.cm-content{
+  flex: 1 1 auto;
+}
+
+.cm-title{
+  margin: 0 0 6px 0;
+  color: #f5f8ff;
+}
+
+.cm-message{
+  margin: 0 0 14px 0;
+  color: #cbd6f2;
+}
+
+.cm-actions{
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cm-btn{
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+}
+
+.cm-cancel{
+  background: rgba(255,255,255,0.04);
+  color: #d7e3ff;
+}
+
+.cm-confirm{
+  background: linear-gradient(135deg,#36a6ff,#5ec6ff);
+  color: #04233a;
+}

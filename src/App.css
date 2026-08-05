@@ -1,38 +1,218 @@
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  width: 100%;
+  font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+  color: #f4f7ff;
+  background: #14181c;
+  overflow-x: hidden;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
+@keyframes pageFadeIn {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(18px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-main {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 90px 24px 48px;
+  overflow-x: hidden;
+}
+
+.home-page,
+.review-page,
+.profile-page,
+.page-card {
+  animation: pageFadeIn 0.95s ease both;
+}
+
+.page-content {
+  display: grid;
+  gap: 48px;
+}
+
+.page-card,
+.page-section {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.24);
+  padding: 32px;
+}
+
+.page-card {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.page-card h1,
+.page-card h2 {
+  margin: 0 0 16px;
+  color: #f8fbff;
+}
+
+.page-card p,
+.page-card label {
+  color: #d7e2f0;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: 24px;
+}
+
+.profile-grid strong {
+  display: block;
+  color: #f8fbff;
+  margin-bottom: 8px;
+}
+
+.auth-form {
+  display: grid;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.auth-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.auth-brand {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: #ffffff;
+  color: #14181c;
+  font-weight: 800;
+  font-size: 1.1rem;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.14);
+}
+
+.auth-form label {
+  display: grid;
+  gap: 10px;
+  font-size: 0.95rem;
+  color: #d7e2f0;
+}
+
+.auth-form label span {
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9badcd;
+}
+
+.auth-form input,
+.auth-form select,
+.auth-form textarea {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #f8fbff;
+  outline: none;
+}
+
+.auth-form select {
+  appearance: none;
+}
+
+.auth-form input::placeholder,
+.auth-form textarea::placeholder {
+  color: rgba(248, 251, 255, 0.5);
+}
+
+.auth-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.auth-grid .full-width {
+  grid-column: 1 / -1;
+}
+
+.auth-form button,
+.card-button {
+  width: fit-content;
+  border: none;
+  border-radius: 999px;
+  padding: 14px 24px;
+  background: #36a6ff;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.auth-form button:hover,
+.card-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(54, 166, 255, 0.32);
+}
+
+.auth-page-card {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.error-message {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 85, 85, 0.12);
+  color: #ff5f5f;
+  border: 1px solid rgba(255, 85, 85, 0.22);
+  font-size: 0.95rem;
+}
+
+.field-error input,
+.field-error select {
+  border-color: rgba(255, 85, 85, 0.9);
+}
+
+.auth-footer {
+  margin-top: 20px;
+  color: #c6d1e3;
+}
+
+.auth-footer a {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.auth-form button:hover,
+.card-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(54, 166, 255, 0.32);
+}
+
+@media (max-width: 860px) {
+  .app-main {
+    padding: 72px 18px 36px;
+  }
+
+  .page-card,
+  .page-section {
+    padding: 24px;
+    border-radius: 24px;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
   }
 }

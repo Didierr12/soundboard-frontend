@@ -1,0 +1,665 @@
+/* ==========================================================================
+   PROFILE PAGE - INMERSIVO & ESTILO IA (SOUNDBOARD)
+   ========================================================================== */
+
+.profile-page {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  padding: 32px 24px 64px;
+  box-sizing: border-box;
+  min-height: 100vh;
+  
+  /* Imagen de fondo estilo concierto con degradado oscuro para legibilidad */
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(54, 166, 255, 0.15), transparent 70%),
+    linear-gradient(180deg, rgba(8, 14, 30, 0.78) 0%, rgba(8, 14, 30, 0.94) 100%),
+    url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat fixed;
+}
+
+.profile-container {
+  width: min(1280px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+/* ==========================================================================
+   HEADER DE PERFIL
+   ========================================================================== */
+
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  padding: 36px 40px;
+  background: rgba(18, 28, 51, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(54, 166, 255, 0.25);
+  border-radius: 28px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Brillo ambiental superior en la tarjeta */
+.profile-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(54, 166, 255, 0.6), transparent);
+}
+
+/* Avatar circular brillante */
+.avatar {
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #36a6ff 0%, #0066cc 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 2.6rem;
+  color: #ffffff;
+  box-shadow: 0 0 30px rgba(54, 166, 255, 0.4);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* Información Principal */
+.user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.user-info h1 {
+  margin: 0;
+  font-size: clamp(2rem, 3vw, 2.8rem);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.bio {
+  margin: 0;
+  color: #a3b8dd;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 680px;
+}
+
+/* Fichas de Estadísticas */
+.stats {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.stats > div {
+  background: rgba(11, 20, 38, 0.8);
+  border: 1px solid rgba(54, 166, 255, 0.2);
+  padding: 12px 22px;
+  border-radius: 16px;
+  min-width: 105px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 200ms ease;
+}
+
+.stats > div:hover {
+  border-color: #36a6ff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(54, 166, 255, 0.15);
+}
+
+.stats div strong {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #7997c9;
+  font-weight: 700;
+}
+
+.stats div div {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* Botón Editar Perfil */
+.edit-profile-toggle {
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 10px 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(54, 166, 255, 0.3);
+  background: rgba(17, 27, 51, 0.9);
+  color: #e9efff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.edit-profile-toggle:hover {
+  background: #36a6ff;
+  border-color: #36a6ff;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(54, 166, 255, 0.3);
+}
+
+/* ==========================================================================
+   FORMULARIO DE EDICIÓN
+   ========================================================================== */
+
+.edit-profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.edit-profile-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.edit-profile-form label span {
+  color: #7997c9;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.edit-profile-form input,
+.edit-profile-form textarea {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: rgba(8, 14, 30, 0.8);
+  border: 1px solid rgba(54, 166, 255, 0.25);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.98rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 200ms ease;
+}
+
+.edit-profile-form input:focus,
+.edit-profile-form textarea:focus {
+  border-color: #36a6ff;
+  box-shadow: 0 0 12px rgba(54, 166, 255, 0.25);
+  background: rgba(8, 14, 30, 0.95);
+}
+
+.edit-profile-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.primary-btn, 
+.secondary-btn {
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  cursor: pointer;
+  border: none;
+  transition: all 200ms ease;
+}
+
+.primary-btn {
+  background: #36a6ff;
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(54, 166, 255, 0.3);
+}
+
+.primary-btn:hover {
+  background: #2093ed;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(54, 166, 255, 0.45);
+}
+
+.primary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.secondary-btn {
+  background: rgba(17, 27, 51, 0.8);
+  color: #e9efff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.secondary-btn:hover {
+  background: rgba(31, 46, 77, 0.9);
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   SECCIONES PRINCIPALES (ARTISTAS & RESEÑAS)
+   ========================================================================== */
+
+.profile-sections {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.favorites h2, 
+.user-reviews h2 {
+  margin: 0 0 20px 0;
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* Grid de Favoritos */
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+  gap: 16px;
+}
+
+.fav-card {
+  background: rgba(18, 28, 51, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(54, 166, 255, 0.18);
+  border-radius: 20px;
+  padding: 14px;
+  text-align: center;
+  transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fav-card:hover {
+  transform: translateY(-6px);
+  border-color: #36a6ff;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(54, 166, 255, 0.2);
+  background: rgba(24, 38, 69, 0.9);
+}
+
+.fav-thumb {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  height: auto;
+  background: rgba(11, 20, 38, 0.9);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fav-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 300ms ease;
+}
+
+.fav-card:hover .fav-thumb img {
+  transform: scale(1.06);
+}
+
+.fav-name {
+  margin-top: 12px;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fav-followers {
+  font-size: 0.8rem;
+  color: #7997c9;
+  margin-top: 3px;
+}
+
+/* Lista de Reseñas */
+.user-reviews ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.review-row {
+  padding: 22px;
+  border-radius: 22px;
+  background: rgba(18, 28, 51, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(54, 166, 255, 0.18);
+  color: #ffffff;
+  transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.review-row:hover {
+  transform: translateY(-3px);
+  border-color: #36a6ff;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4), 0 0 15px rgba(54, 166, 255, 0.15);
+  background: rgba(24, 38, 69, 0.9);
+}
+
+.review-header-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+
+.review-meta {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.review-cover {
+  width: 68px;
+  min-width: 68px;
+  height: 68px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(11, 20, 38, 0.9);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.review-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.review-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  background: rgba(11, 20, 38, 0.9);
+}
+
+.review-target {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #ffffff;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.review-type {
+  font-size: 0.88rem;
+  color: #7997c9;
+}
+
+.review-body {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(54, 166, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.review-rating {
+  color: #ffc107;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+}
+
+.review-text {
+  color: #dce7fa;
+  line-height: 1.6;
+  font-size: 0.96rem;
+  font-style: italic;
+}
+
+.review-date {
+  color: #7997c9;
+  font-size: 0.8rem;
+  margin-top: 6px;
+}
+
+.profile-note {
+  color: #7997c9;
+  margin: 12px 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.profile-note.error {
+  color: #f87171;
+}
+
+/* Estado de Perfil Bloqueado */
+.auth-locked {
+  background: rgba(18, 28, 51, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(54, 166, 255, 0.25);
+  border-radius: 28px;
+  padding: 64px 32px;
+  text-align: center;
+  max-width: 480px;
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.auth-locked h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 2rem;
+}
+
+.auth-locked p {
+  margin: 0;
+  color: #7997c9;
+  font-size: 1rem;
+}
+
+.auth-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  padding: 14px 32px;
+  border-radius: 999px;
+  background: #36a6ff;
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(54, 166, 255, 0.3);
+  transition: all 200ms ease;
+}
+
+.auth-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(54, 166, 255, 0.45);
+  background: #2093ed;
+}
+
+/* ==========================================================================
+   ACCIONES DE RESEÑAS (EDITAR Y ELIMINAR)
+   ========================================================================== */
+
+.review-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.review-action-btn {
+  background: rgba(11, 20, 38, 0.8);
+  border: 1px solid rgba(54, 166, 255, 0.2);
+  color: #a3b8dd;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 180ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.review-action-btn:hover {
+  transform: translateY(-1px);
+  color: #ffffff;
+}
+
+.review-action-btn.edit:hover {
+  background: rgba(54, 166, 255, 0.2);
+  border-color: #36a6ff;
+  color: #36a6ff;
+}
+
+.review-action-btn.delete:hover {
+  background: rgba(248, 113, 113, 0.2);
+  border-color: #f87171;
+  color: #f87171;
+}
+
+/* Formulario de Edición de Reseña Inline */
+.edit-review-box {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(54, 166, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.edit-review-stars {
+  display: flex;
+  gap: 4px;
+}
+
+.star-edit-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  padding: 0;
+  transition: all 150ms ease;
+}
+
+.star-edit-btn.active,
+.star-edit-btn:hover {
+  color: #ffc107;
+  transform: scale(1.15);
+}
+
+.edit-review-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(8, 14, 30, 0.85);
+  border: 1px solid rgba(54, 166, 255, 0.25);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.92rem;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.edit-review-textarea:focus {
+  border-color: #36a6ff;
+  box-shadow: 0 0 10px rgba(54, 166, 255, 0.2);
+}
+
+.edit-review-btns {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn-small-primary {
+  background: #36a6ff;
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.btn-small-primary:hover {
+  background: #2093ed;
+  transform: translateY(-1px);
+}
+
+.btn-small-secondary {
+  background: rgba(17, 27, 51, 0.8);
+  color: #e9efff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.btn-small-secondary:hover {
+  background: rgba(31, 46, 77, 0.9);
+}
+
+/* Responsivo */
+@media (max-width: 900px) {
+  .profile-sections {
+    grid-template-columns: 1fr;
+  }
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .edit-profile-toggle {
+    align-self: center;
+  }
+  .stats {
+    justify-content: center;
+  }
+}
