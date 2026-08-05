@@ -47,7 +47,7 @@ function Home() {
       setReviewsError('');
 
       try {
-        const response = await fetch('http://localhost:5001/api/resenas');
+        const response = await fetch('https://soundboard-api-gyf6.onrender.com/api/resenas');
         if (!response.ok) throw new Error('No se pudieron obtener las reseñas.');
         const data = await response.json();
         setReviews(Array.isArray(data) ? data : []);
@@ -67,7 +67,7 @@ function Home() {
       setStatsLoading(true);
 
       try {
-        const response = await fetch('http://localhost:5001/api/estadisticas');
+        const response = await fetch('https://soundboard-api-gyf6.onrender.com/api/estadisticas');
         if (!response.ok) throw new Error('No se pudieron obtener las estadísticas.');
 
         const data = await response.json();

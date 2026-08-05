@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import CustomDropdown from '../components/CustomDropdown/CustomDropdown';
 import ConfirmModal from '../components/ConfirmModal/ConfirmModal';
 
-const API_BASE_URL = 'http://localhost:5001/api';
+const API_BASE_URL = 'https://soundboard-api-gyf6.onrender.com/api';
 
 function Register() {
   const navigate = useNavigate();

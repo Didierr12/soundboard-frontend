@@ -195,7 +195,7 @@ function Review() {
     }
 
     try {
-      const res = await fetch(`http://localhost:5001/api/usuarios/${encodeURIComponent(userId)}/favoritos`);
+      const res = await fetch(`https://soundboard-api-gyf6.onrender.com/api/usuarios/${encodeURIComponent(userId)}/favoritos`);
       if (res.ok) {
         const data = await res.json();
         const ids = Array.isArray(data) ? data.map((fav) => String(fav.spotify_artist_id)) : [];
@@ -213,7 +213,7 @@ function Review() {
     }
 
     try {
-      const res = await fetch(`http://localhost:5001/api/favoritos/artista/${encodeURIComponent(spotifyArtistId)}`);
+      const res = await fetch(`https://soundboard-api-gyf6.onrender.com/api/favoritos/artista/${encodeURIComponent(spotifyArtistId)}`);
       if (res.ok) {
         const data = await res.json();
         setSelectedArtistFollowers(data.seguidores ?? 0);
@@ -256,7 +256,7 @@ function Review() {
   const fetchPublicReviews = async () => {
     setLoadingReviews(true);
     try {
-      const res = await fetch('http://localhost:5001/api/resenas');
+      const res = await fetch('https://soundboard-api-gyf6.onrender.com/api/resenas');
       if (res.ok) {
         const data = await res.json();
         setPublicReviews(Array.isArray(data) ? data : []);
@@ -278,7 +278,7 @@ function Review() {
 
     try {
       const res = await fetch(
-        `http://localhost:5001/api/spotify/buscar?q=${encodeURIComponent(queryText.trim())}`
+        `https://soundboard-api-gyf6.onrender.com/api/spotify/buscar?q=${encodeURIComponent(queryText.trim())}`
       );
 
       if (res.ok) {
@@ -338,7 +338,7 @@ function Review() {
     try {
       if (isFavorite) {
         const res = await fetch(
-          `http://localhost:5001/api/usuarios/${encodeURIComponent(userId)}/favoritos/${encodeURIComponent(artistId)}`,
+          `https://soundboard-api-gyf6.onrender.com/api/usuarios/${encodeURIComponent(userId)}/favoritos/${encodeURIComponent(artistId)}`,
           { method: 'DELETE' }
         );
 
@@ -348,7 +348,7 @@ function Review() {
           await fetchArtistFollowers(artistId);
         }
       } else {
-        const res = await fetch(`http://localhost:5001/api/usuarios/${encodeURIComponent(userId)}/favoritos`, {
+        const res = await fetch(`https://soundboard-api-gyf6.onrender.com/api/usuarios/${encodeURIComponent(userId)}/favoritos`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ spotify_artist_id: artistId, nombre: title, imagen_url: image }),
@@ -394,7 +394,7 @@ function Review() {
         comentario: comment.trim() || '',
       };
 
-      const res = await fetch('http://localhost:5001/api/resenas', {
+      const res = await fetch('https://soundboard-api-gyf6.onrender.com/api/resenas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

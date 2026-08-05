@@ -31,7 +31,7 @@ function Profile() {
   const loadFavoriteArtists = async (userId) => {
     if (!userId) return [];
     try {
-      const response = await fetch(`http://localhost:5001/api/usuarios/${encodeURIComponent(userId)}/favoritos`);
+      const response = await fetch(`https://soundboard-api-gyf6.onrender.com/api/usuarios/${encodeURIComponent(userId)}/favoritos`);
       if (!response.ok) {
         throw new Error('No se pudieron cargar los artistas favoritos.');
       }
@@ -69,7 +69,7 @@ function Profile() {
     setReviewsError('');
 
     try {
-      const response = await fetch(`http://localhost:5001/api/resenas/usuario/${encodeURIComponent(userId)}`);
+      const response = await fetch(`https://soundboard-api-gyf6.onrender.com/api/resenas/usuario/${encodeURIComponent(userId)}`);
       if (!response.ok) {
         throw new Error('No se pudieron cargar tus reseñas.');
       }
@@ -90,7 +90,7 @@ function Profile() {
 
   const handleDeleteReview = async (reviewId) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/resenas/${encodeURIComponent(reviewId)}`, {
+      const response = await fetch(`https://soundboard-api-gyf6.onrender.com/api/resenas/${encodeURIComponent(reviewId)}`, {
         method: 'DELETE',
       });
 
@@ -124,7 +124,7 @@ function Profile() {
 
     setReviewSaving(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/resenas/${encodeURIComponent(reviewId)}`, {
+      const response = await fetch(`https://soundboard-api-gyf6.onrender.com/api/resenas/${encodeURIComponent(reviewId)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -187,7 +187,7 @@ function Profile() {
     setProfileError('');
 
     try {
-      const response = await fetch(`http://localhost:5001/api/usuarios/${encodeURIComponent(userId)}`, {
+      const response = await fetch(`https://soundboard-api-gyf6.onrender.com/api/usuarios/${encodeURIComponent(userId)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: usernameValue, biografia: editBio.trim() }),

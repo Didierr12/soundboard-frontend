@@ -14,7 +14,7 @@ function Trending() {
       setError('');
 
       try {
-        const response = await fetch('http://localhost:5001/api/resenas/top-canciones');
+        const response = await fetch('https://soundboard-api-gyf6.onrender.com/api/resenas/top-canciones');
         if (!response.ok) {
           throw new Error('No se pudo cargar el top de canciones.');
         }

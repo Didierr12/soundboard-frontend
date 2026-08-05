@@ -127,8 +127,8 @@ function Recomendaciones() {
 
     const userId = getCurrentUserId();
     const endpoint = userId
-      ? `http://localhost:5001/api/recomendaciones/${encodeURIComponent(userId)}`
-      : 'http://localhost:5001/api/recomendaciones';
+      ? `https://soundboard-api-gyf6.onrender.com/api/recomendaciones/${encodeURIComponent(userId)}`
+      : 'https://soundboard-api-gyf6.onrender.com/api/recomendaciones';
 
     try {
       setIsLoading(true);
