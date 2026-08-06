@@ -65,7 +65,7 @@ const getBadgeClass = (item) => {
 };
 
 const getItemImage = (item) => {
-  if (!item) return 'https://via.placeholder.com/150';
+  if (!item) return 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=600&auto=format&fit=crop';
   if (typeof item === 'string' && item.startsWith('http')) return item;
 
   if (item.imagen_url && item.imagen_url.startsWith('http')) return item.imagen_url;
@@ -77,7 +77,7 @@ const getItemImage = (item) => {
   if (item.album?.images && Array.isArray(item.album.images) && item.album.images[0]?.url) {
     return item.album.images[0].url;
   }
-  return 'https://via.placeholder.com/150';
+  return 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=600&auto=format&fit=crop';
 };
 
 const getItemArtist = (item) => {
@@ -153,6 +153,14 @@ const extractItemsFromSearchResponse = (res) => {
   return interleaved;
 };
 
+// Imágenes para el slider hero estilizado
+const HERO_BACKGROUNDS = [
+  'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1920&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1920&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=1920&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=1920&auto=format&fit=crop'
+];
+
 function Review() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('Todos');
@@ -176,11 +184,21 @@ function Review() {
   const [publicReviews, setPublicReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
 
+  const [heroIndex, setHeroIndex] = useState(0);
+
   const searchContainerRef = useRef(null);
 
   const selectedItemId = getItemId(selectedItem);
   const isArtistSelected = selectedItem && getTypeLabel(selectedItem) === 'Artista';
   const isFavorite = isArtistSelected && selectedItemId && favoriteArtistIds.includes(selectedItemId);
+
+  // Auto carrusel hero
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeroIndex((prevIndex) => (prevIndex + 1) % HERO_BACKGROUNDS.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, []);
 
   const getCurrentUserId = () => {
     const currentUser = user || {};
@@ -428,28 +446,61 @@ function Review() {
 
   return (
     <div className="review-page-container">
-      
-
-      {/* HERO BANNER - ESTILO BANNER DESTACADO DE LA IMAGEN */}
+      {/* HERO BANNER CON IMAGEN DE FONDO Y TARJETA GLASSMORPHISM EXACTA A LA FOTO DE REFERENCIA */}
       <section className="review-hero-section">
+        <div className="hero-background-carousel">
+          {HERO_BACKGROUNDS.map((bgUrl, idx) => (
+            <div
+              key={idx}
+              className={`hero-bg-slide ${idx === heroIndex ? 'active' : ''}`}
+              style={{ backgroundImage: `url(${bgUrl})` }}
+            />
+          ))}
+          <div className="hero-vignette-overlay" />
+        </div>
+
         <div className="hero-banner-container">
-          <div className="hero-callout-card">
-            <span className="hero-subtitle-tag">SoundBoard 2026 Insights</span>
-            <h1 className="hero-title-main">Momentum leads to results.</h1>
-            <a href="#buscar-seccion" className="hero-action-link">
-              Escribir una reseña <span className="arrow-icon">→</span>
-            </a>
+          <div className="hero-glass-card">
+            <span className="hero-subtitle-tag">RESEÑAS MUSICALES ESTILO LETTERBOXD</span>
+            <h1 className="hero-title-main">
+              Explora álbumes, comparte reseñas y descubre nuevas canciones.
+            </h1>
+            <p className="hero-description-text">
+              Crea tu lista de álbumes favoritos, califica lo que escuchas y sigue recomendaciones personalizadas basadas en tus gustos.
+            </p>
+
+            <div className="hero-cta-group">
+              <a href="#buscar-seccion" className="hero-btn-primary">
+                Iniciar sesión
+              </a>
+              <a href="#buscar-seccion" className="hero-btn-secondary">
+                Crear cuenta
+              </a>
+            </div>
+
+            <div className="hero-card-footer">
+              <span className="hero-footer-caption">COMPARTE TU MÚSICA FAVORITA</span>
+              <div className="hero-carousel-dots">
+                {HERO_BACKGROUNDS.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className={`carousel-dot ${idx === heroIndex ? 'active' : ''}`}
+                    onClick={() => setHeroIndex(idx)}
+                    aria-label={`Ver diapositiva ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
         {/* GRID DE BÚSQUEDA Y FORMULARIO */}
         <div className="review-hero-grid" id="buscar-seccion">
-          
           {/* PANEL IZQUIERDO: BUSCADOR Y RESULTADOS */}
           <div className="review-search-panel">
             <div className="search-box-wrapper" ref={searchContainerRef}>
               <form className="search-bar-inner" onSubmit={handleSearchSubmit}>
-                
                 {/* Dropdown de Filtro */}
                 <div className="filter-dropdown-wrapper">
                   <button
@@ -553,11 +604,14 @@ function Review() {
                     className={`result-card ${isSelected ? 'selected' : ''}`}
                     onClick={() => handleSelectItem(item)}
                   >
-                    <img
-                      src={getItemImage(item)}
-                      alt={item.name || item.titulo || item.titulo_album}
-                      className="result-card-img"
-                    />
+                    <div className="result-card-img-wrapper">
+                      <img
+                        src={getItemImage(item)}
+                        alt={item.name || item.titulo || item.titulo_album}
+                        className="result-card-img"
+                      />
+                      <div className="result-card-overlay-glow" />
+                    </div>
                     <div className="result-card-info">
                       <div className="result-card-header">
                         <h3>{item.name || item.titulo || item.titulo_album}</h3>
@@ -613,6 +667,7 @@ function Review() {
               </div>
             ) : (
               <div className="selected-placeholder">
+                <div className="placeholder-icon">🎵</div>
                 <p>Busca y selecciona un álbum, canción o artista para comenzar tu reseña.</p>
               </div>
             )}
@@ -657,7 +712,6 @@ function Review() {
               {isPublishing ? 'Publicando...' : 'Publicar Reseña →'}
             </button>
           </div>
-
         </div>
       </section>
 
@@ -670,7 +724,10 @@ function Review() {
 
         <div className="review-cards-grid">
           {loadingReviews ? (
-            <p className="feed-loading-text">Cargando opiniones...</p>
+            <div className="feed-loading-container">
+              <div className="pulsing-spinner" />
+              <p className="feed-loading-text">Cargando opiniones de la comunidad...</p>
+            </div>
           ) : publicReviews.length > 0 ? (
             publicReviews.map((rev, idx) => {
               const itemTypeLabel = getTypeLabel(rev);
@@ -681,11 +738,13 @@ function Review() {
               return (
                 <article key={rev.id || idx} className="feed-review-card">
                   <div className="feed-card-header">
-                    <img
-                      src={getItemImage(rev)}
-                      alt={rev.titulo_album || rev.titulo || 'Música'}
-                      className="feed-card-thumb"
-                    />
+                    <div className="feed-card-thumb-wrapper">
+                      <img
+                        src={getItemImage(rev)}
+                        alt={rev.titulo_album || rev.titulo || 'Música'}
+                        className="feed-card-thumb"
+                      />
+                    </div>
                     <div className="feed-card-item-info">
                       <span className={`card-badge ${getBadgeClass(rev)}`}>
                         {itemTypeLabel}
