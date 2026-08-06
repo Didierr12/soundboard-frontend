@@ -177,133 +177,132 @@ function Recomendaciones() {
       <div className="ambient-glow glow-1" />
       <div className="ambient-glow glow-2" />
 
-      <section className="recommendations-hero-section">
-        <div className="recommendations-hero-bg" />
-        <div className="recommendations-hero-overlay" />
-        <div className="recommendations-hero-card">
-          <span className="hero-subtitle-tag">RECOMENDACIONES POTENCIADAS POR IA</span>
-          <h1 className="hero-title-main">
-            Conecta tu estado de ánimo con la música perfecta.
-          </h1>
-          <p className="hero-description-text">
-            Deja que la IA genere listas de reproducción, descubra nuevos géneros y encuentre el ritmo exacto para cada momento.
-          </p>
+      <div className="recommendations-container">
+        <section className="recommendations-hero-section">
+          <div className="recommendations-hero-card">
+            <span className="hero-subtitle-tag">RECOMENDACIONES POTENCIADAS POR IA</span>
+            <h1 className="hero-title-main">
+              Conecta tu estado de ánimo con la música perfecta.
+            </h1>
+            <p className="hero-description-text">
+              Deja que la IA genere listas de reproducción, descubra nuevos géneros y encuentre el ritmo exacto para cada momento.
+            </p>
 
-          <div className="hero-cta-group">
-            <a href="#recommendation-chat" className="hero-btn-primary">
-              Conversar con IA
-            </a>
-            <a href="#recommendation-chat" className="hero-btn-secondary">
-              Ver sugerencias
-            </a>
+            <div className="hero-cta-group">
+              <a href="#recommendation-chat" className="hero-btn-primary">
+                Conversar con IA
+              </a>
+              <a href="#recommendation-chat" className="hero-btn-secondary">
+                Ver sugerencias
+              </a>
+            </div>
+
+            <div className="hero-card-footer">
+              <span className="hero-footer-caption">UNA EXPERIENCIA MUSICAL INTELIGENTE</span>
+            </div>
           </div>
+        </section>
 
-          <div className="hero-card-footer">
-            <span className="hero-footer-caption">UNA EXPERIENCIA MUSICAL INTELIGENTE</span>
-          </div>
-        </div>
-      </section>
-
-      <section className="recommendations-panel-section">
         <div className="recommendations-panel">
           <header className="recommendations-header">
-          <div className="header-info">
-            <span className="eyebrow-badge">
-              <span className="sparkle"><SparklesIcon /></span> SoundBoard AI Assistant
-            </span>
-            <h1>Centro de Recomendaciones</h1>
-            <p>Siente la vibra previa al show. Pide recomendaciones personalizadas a la IA antes de que empiece el concierto.</p>
-          </div>
-
-          <div className="recommendations-status">
-            <div className={`status-badge ${isAuthenticated ? 'online' : 'offline'}`}>
-              <span className="status-dot" />
-              <span>{isAuthenticated ? `Usuario: ${user?.username || user?.nombre_completo || 'Conectado'}` : 'Sin Sesión'}</span>
+            <div className="header-info">
+              <span className="eyebrow-badge">
+                <span className="sparkle"><SparklesIcon /></span> SoundBoard AI Assistant
+              </span>
+              <h1>Centro de Recomendaciones</h1>
+              <p>Siente la vibra previa al show. Pide recomendaciones personalizadas a la IA antes de que empiece el concierto.</p>
             </div>
-            <div className="model-badge">
-              <span>IA Activa v2.5</span>
-            </div>
-          </div>
-        </header>
 
-        {/* Ventana de Chat */}
-        <div id="recommendation-chat" className="recommendations-chat-window">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`chat-row ${message.sender === 'bot' ? 'bot-row' : 'user-row'}`}
-            >
-              <div className="chat-avatar">
-                {message.sender === 'bot' ? <SparklesIcon /> : <UserIcon />}
+            <div className="recommendations-status">
+              <div className={`status-badge ${isAuthenticated ? 'online' : 'offline'}`}>
+                <span className="status-dot" />
+                <span>{isAuthenticated ? `Usuario: ${user?.username || user?.nombre_completo || 'Conectado'}` : 'Sin Sesión'}</span>
               </div>
-              <div className={`chat-bubble ${message.sender === 'bot' ? 'bot-bubble' : 'user-bubble'}`}>
-                <span className="sender-label">
-                  {message.sender === 'bot' ? 'SoundBoard AI' : (user?.username || 'Tú')}
-                </span>
-                <p>{message.text}</p>
+              <div className="model-badge">
+                <span>IA Activa v2.5</span>
               </div>
             </div>
-          ))}
+          </header>
 
-          {isTyping && (
-            <div className="chat-row bot-row">
-              <div className="chat-avatar"><SparklesIcon /></div>
-              <div className="chat-bubble bot-bubble typing-bubble">
-                <span className="typing-dot" />
-                <span className="typing-dot" />
-                <span className="typing-dot" />
+          {/* Ventana de Chat */}
+          <div id="recommendation-chat" className="recommendations-chat-window">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`chat-row ${message.sender === 'bot' ? 'bot-row' : 'user-row'}`}
+              >
+                <div className="chat-avatar">
+                  {message.sender === 'bot' ? <SparklesIcon /> : <UserIcon />}
+                </div>
+                <div className={`chat-bubble ${message.sender === 'bot' ? 'bot-bubble' : 'user-bubble'}`}>
+                  <span className="sender-label">
+                    {message.sender === 'bot' ? 'SoundBoard AI' : (user?.username || 'Tú')}
+                  </span>
+                  <p>{message.text}</p>
+                </div>
+              </div>
+            ))}
+
+            {isTyping && (
+              <div className="chat-row bot-row">
+                <div className="chat-avatar"><SparklesIcon /></div>
+                <div className="chat-bubble bot-bubble typing-bubble">
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
+                </div>
+              </div>
+            )}
+            <div ref={chatEndRef} />
+          </div>
+
+          {/* Sugerencias Rápidas */}
+          {isAuthenticated && (
+            <div className="quick-prompts-container">
+              <span className="prompts-label">Sugerencias Rápidas:</span>
+              <div className="quick-prompts-grid">
+                {QUICK_PROMPTS.map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className="prompt-card"
+                    onClick={() => handlePromptClick(item.prompt)}
+                    disabled={isLoading}
+                  >
+                    <span className="prompt-icon">{item.icon}</span>
+                    <div className="prompt-text">
+                      <strong>{item.title}</strong>
+                      <small>{item.prompt}</small>
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
           )}
-          <div ref={chatEndRef} />
-        </div>
 
-        {/* Sugerencias Rápidas */}
-        {isAuthenticated && (
-          <div className="quick-prompts-container">
-            <span className="prompts-label">Sugerencias Rápidas:</span>
-            <div className="quick-prompts-grid">
-              {QUICK_PROMPTS.map((item, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  className="prompt-card"
-                  onClick={() => handlePromptClick(item.prompt)}
-                  disabled={isLoading}
-                >
-                  <span className="prompt-icon">{item.icon}</span>
-                  <div className="prompt-text">
-                    <strong>{item.title}</strong>
-                    <small>{item.prompt}</small>
-                  </div>
-                </button>
-              ))}
+          {error && <div className="recommendations-error">⚠️ {error}</div>}
+
+          {/* Input de consulta */}
+          <form className="recommendations-form" onSubmit={handleSubmit}>
+            <div className="input-wrapper">
+              <input
+                type="text"
+                placeholder={isAuthenticated ? 'Escribe tu consulta o pide una lista de reproducción...' : 'Inicia sesión para interactuar con la IA'}
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                disabled={!isAuthenticated || isLoading}
+              />
+              <button
+                type="submit"
+                className="send-btn"
+                disabled={!isAuthenticated || isLoading || !inputText.trim()}
+                title="Enviar mensaje"
+              >
+                {isLoading ? <span className="spinner" /> : <SendIcon />}
+              </button>
             </div>
-          </div>
-        )}
-
-        {error && <div className="recommendations-error">⚠️ {error}</div>}
-
-        {/* Input de consulta */}
-        <form className="recommendations-form" onSubmit={handleSubmit}>
-          <div className="input-wrapper">
-            <input
-              type="text"
-              placeholder={isAuthenticated ? 'Escribe tu consulta o pide una lista de reproducción...' : 'Inicia sesión para interactuar con la IA'}
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              disabled={!isAuthenticated || isLoading}
-            />
-            <button
-              type="submit"
-              className="send-btn"
-              disabled={!isAuthenticated || isLoading || !inputText.trim()}
-              title="Enviar mensaje"
-            >
-              {isLoading ? <span className="spinner" /> : <SendIcon />}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

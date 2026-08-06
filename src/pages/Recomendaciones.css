@@ -24,6 +24,17 @@
   background-attachment: fixed;
 }
 
+.recommendations-container {
+  width: min(1100px, 100%);
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  position: relative;
+  z-index: 1;
+}
+
 /* Capa adicional para acentuar el contraste del texto */
 .stage-overlay {
   position: absolute;
@@ -214,14 +225,9 @@
 /* ==========================================
    PANEL DE CHAT GLASSMORPHIC
    ========================================== */
-.recommendations-panel-section {
-  width: min(1100px, 100%);
-  display: flex;
-  justify-content: center;
-}
-
 .recommendations-panel {
   width: 100%;
+  max-width: 1100px;
   display: flex;
   flex-direction: column;
   gap: 24px;
