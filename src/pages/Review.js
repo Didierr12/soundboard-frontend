@@ -429,19 +429,6 @@ function Review() {
   return (
     <div className="review-page-container">
       
-      {/* NAVBAR SUPERIOR ESTILO CORPORATIVO OSCURO */}
-      <nav className="corporate-top-nav">
-        <div className="nav-container">
-          <span className="brand-title">SOUNDBOARD</span>
-          <div className="nav-links">
-            <span className="nav-item">Comunidad</span>
-            <span className="nav-item">Álbumes</span>
-            <span className="nav-item">Artistas</span>
-            <span className="nav-item">Canciones</span>
-            <span className="nav-item accent-link">Buscar 🔍</span>
-          </div>
-        </div>
-      </nav>
 
       {/* HERO BANNER - ESTILO BANNER DESTACADO DE LA IMAGEN */}
       <section className="review-hero-section">
