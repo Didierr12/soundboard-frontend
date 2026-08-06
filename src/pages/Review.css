@@ -182,59 +182,156 @@ body {
 }
 
 /* Callout Hero Banner Card */
-.hero-banner-container {
+.review-hero-background-carousel {
+  position: relative;
   width: 100%;
+  min-height: 540px;
+  border-radius: var(--border-radius-main);
+  overflow: hidden;
+  background: #090e18;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.hero-callout-card {
-  width: 100%;
-  background: linear-gradient(135deg, rgba(30, 27, 75, 0.85) 0%, rgba(15, 23, 42, 0.9) 60%, rgba(13, 20, 32, 0.95) 100%);
-  border: 1px solid rgba(168, 85, 247, 0.3);
-  border-radius: var(--border-radius-main);
-  padding: 40px 48px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  backdrop-filter: var(--backdrop-blur-panel);
-  -webkit-backdrop-filter: var(--backdrop-blur-panel);
+.review-hero-bg-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(1.05);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.review-hero-bg-slide.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.review-hero-vignette-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.55) 0%, rgba(13, 20, 32, 0.96) 70%);
+  pointer-events: none;
+}
+
+.review-hero-card {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: 40px 42px;
+  border-radius: 32px;
+  background: rgba(15, 23, 42, 0.86);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 22px;
 }
 
 .hero-subtitle-tag {
   font-size: 0.82rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #c084fc;
+  letter-spacing: 0.14em;
+  color: #7dd3fc;
 }
 
 .hero-title-main {
-  font-size: clamp(2rem, 3.5vw, 3.2rem);
+  font-size: clamp(2.1rem, 3.2vw, 3.4rem);
   font-weight: 800;
   color: var(--text-heading);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  margin: 0;
 }
 
-.hero-action-link {
+.hero-description-text {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.hero-cta-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.hero-btn-primary,
+.hero-btn-secondary {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  color: var(--cyan-glow);
+  justify-content: center;
+  padding: 14px 28px;
+  border-radius: 999px;
   font-weight: 700;
-  font-size: 1.05rem;
   text-decoration: none;
-  transition: gap var(--transition-fast), color var(--transition-fast);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-.hero-action-link:hover {
+.hero-btn-primary {
+  background: linear-gradient(135deg, #22d3ee 0%, #0ea5e9 100%);
   color: #ffffff;
-  gap: 12px;
+  box-shadow: 0 12px 26px rgba(34, 211, 238, 0.25);
 }
 
-.arrow-icon {
-  font-size: 1.2rem;
+.hero-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 32px rgba(34, 211, 238, 0.3);
+}
+
+.hero-btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.hero-btn-secondary:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.hero-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hero-footer-caption {
+  color: #94a3b8;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hero-carousel-dots {
+  display: flex;
+  gap: 10px;
+}
+
+.carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.carousel-dot:hover,
+.carousel-dot.active {
+  transform: scale(1.15);
+  background: rgba(56, 189, 248, 0.95);
 }
 
 /* Grid Layout */

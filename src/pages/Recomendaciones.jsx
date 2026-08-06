@@ -177,6 +177,33 @@ function Recomendaciones() {
       <div className="ambient-glow glow-1" />
       <div className="ambient-glow glow-2" />
 
+      <section className="recommendations-hero-section">
+        <div className="recommendations-hero-bg" />
+        <div className="recommendations-hero-overlay" />
+        <div className="recommendations-hero-card">
+          <span className="hero-subtitle-tag">RECOMENDACIONES POTENCIADAS POR IA</span>
+          <h1 className="hero-title-main">
+            Conecta tu estado de ánimo con la música perfecta.
+          </h1>
+          <p className="hero-description-text">
+            Deja que la IA genere listas de reproducción, descubra nuevos géneros y encuentre el ritmo exacto para cada momento.
+          </p>
+
+          <div className="hero-cta-group">
+            <a href="#recommendation-chat" className="hero-btn-primary">
+              Conversar con IA
+            </a>
+            <a href="#recommendation-chat" className="hero-btn-secondary">
+              Ver sugerencias
+            </a>
+          </div>
+
+          <div className="hero-card-footer">
+            <span className="hero-footer-caption">UNA EXPERIENCIA MUSICAL INTELIGENTE</span>
+          </div>
+        </div>
+      </section>
+
       <div className="recommendations-panel">
         <header className="recommendations-header">
           <div className="header-info">
@@ -199,7 +226,7 @@ function Recomendaciones() {
         </header>
 
         {/* Ventana de Chat */}
-        <div className="recommendations-chat-window">
+        <div id="recommendation-chat" className="recommendations-chat-window">
           {messages.map((message) => (
             <div
               key={message.id}

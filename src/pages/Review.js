@@ -446,21 +446,19 @@ function Review() {
 
   return (
     <div className="review-page-container">
-      {/* HERO BANNER CON IMAGEN DE FONDO Y TARJETA GLASSMORPHISM EXACTA A LA FOTO DE REFERENCIA */}
+      {/* HERO BANNER CON IMAGEN DE FONDO Y TARJETA GLASSMORPHISM ADAPTADA */}
       <section className="review-hero-section">
-        <div className="hero-background-carousel">
+        <div className="review-hero-background-carousel">
           {HERO_BACKGROUNDS.map((bgUrl, idx) => (
             <div
               key={idx}
-              className={`hero-bg-slide ${idx === heroIndex ? 'active' : ''}`}
+              className={`review-hero-bg-slide ${idx === heroIndex ? 'active' : ''}`}
               style={{ backgroundImage: `url(${bgUrl})` }}
             />
           ))}
-          <div className="hero-vignette-overlay" />
-        </div>
+          <div className="review-hero-vignette-overlay" />
 
-        <div className="hero-banner-container">
-          <div className="hero-glass-card">
+          <div className="review-hero-card">
             <span className="hero-subtitle-tag">RESEÑAS MUSICALES ESTILO LETTERBOXD</span>
             <h1 className="hero-title-main">
               Explora álbumes, comparte reseñas y descubre nuevas canciones.
@@ -471,10 +469,10 @@ function Review() {
 
             <div className="hero-cta-group">
               <a href="#buscar-seccion" className="hero-btn-primary">
-                Iniciar sesión
+                Buscar reseñas
               </a>
               <a href="#buscar-seccion" className="hero-btn-secondary">
-                Crear cuenta
+                Publicar reseña
               </a>
             </div>
 

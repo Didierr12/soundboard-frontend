@@ -41,6 +41,48 @@
   animation: glowPulse 8s infinite alternate ease-in-out;
 }
 
+.recommendations-hero-section {
+  position: relative;
+  width: min(1180px, 100%);
+  margin: 0 auto 28px;
+  padding: 0;
+  min-height: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recommendations-hero-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1920&q=80');
+  background-size: cover;
+  background-position: center;
+  filter: contrast(0.95) brightness(0.68);
+}
+
+.recommendations-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(4, 9, 18, 0.65), rgba(10, 15, 26, 0.92));
+}
+
+.recommendations-hero-card {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 720px);
+  padding: 40px 38px;
+  border-radius: 32px;
+  background: rgba(15, 23, 42, 0.82);
+  border: 1px solid rgba(56, 189, 248, 0.20);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .glow-1 {
   width: 450px;
   height: 450px;
