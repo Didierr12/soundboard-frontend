@@ -5,8 +5,10 @@
   width: 100%;
   min-height: calc(100vh - 80px);
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 28px;
   padding: 30px 24px 60px;
   position: relative;
   box-sizing: border-box;
@@ -212,8 +214,14 @@
 /* ==========================================
    PANEL DE CHAT GLASSMORPHIC
    ========================================== */
-.recommendations-panel {
+.recommendations-panel-section {
   width: min(1100px, 100%);
+  display: flex;
+  justify-content: center;
+}
+
+.recommendations-panel {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 24px;

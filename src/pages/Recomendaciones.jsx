@@ -204,8 +204,9 @@ function Recomendaciones() {
         </div>
       </section>
 
-      <div className="recommendations-panel">
-        <header className="recommendations-header">
+      <section className="recommendations-panel-section">
+        <div className="recommendations-panel">
+          <header className="recommendations-header">
           <div className="header-info">
             <span className="eyebrow-badge">
               <span className="sparkle"><SparklesIcon /></span> SoundBoard AI Assistant
