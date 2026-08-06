@@ -35,8 +35,8 @@ function Trending() {
   return (
     <section className="trending-section">
       <div className="trending-header">
-        <h2>Canciones con más reseñas</h2>
-        <p>Las canciones mejor reseñadas en este momento por la comunidad.</p>
+        <h2>Lo más popular del momento</h2>
+        <p>Checa lo que todo mundo está escuchando ahora mismo.</p>
       </div>
       {error ? (
         <div className="trending-error">{error}</div>

@@ -143,7 +143,7 @@ function Home() {
                 <strong>{statsLoading ? '...' : stats.totalUsers}</strong>
               </div>
               <div className="metric-card">
-                <span>Canciones</span>
+                <span>Canciones reseñadas</span>
                 <strong>{statsLoading ? '...' : stats.totalSongs}</strong>
               </div>
             </div>
