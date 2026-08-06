@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DESIGN SYSTEM: GLASS-CYAN NEON (COMPLETE PRODUCTION STYLESHEET)
+   DESIGN SYSTEM: GLASS-CYAN NEON & CORPORATE DARK (PRODUCTION STYLESHEET)
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -21,6 +21,7 @@
   --cyan-subtle: rgba(54, 166, 255, 0.18);
   --cyan-border: rgba(54, 166, 255, 0.22);
   --cyan-hover-border: rgba(54, 166, 255, 0.32);
+  --purple-glow: #a855f7;
   
   /* Text Colors */
   --text-primary: #ffffff;
@@ -97,7 +98,63 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   3. MAIN CONTAINER & HERO LAYOUT
+   3. CORPORATE TOP NAVIGATION
+   -------------------------------------------------------------------------- */
+.corporate-top-nav {
+  width: 100%;
+  padding: 16px 32px;
+  background: rgba(8, 12, 22, 0.7);
+  backdrop-filter: var(--backdrop-blur-panel);
+  -webkit-backdrop-filter: var(--backdrop-blur-panel);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-container {
+  max-width: 1380px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--text-heading);
+  background: linear-gradient(135deg, #ffffff 0%, var(--cyan-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.nav-item {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.nav-item:hover {
+  color: var(--text-primary);
+}
+
+.accent-link {
+  color: var(--cyan-accent);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   4. MAIN CONTAINER & HERO BANNER
    -------------------------------------------------------------------------- */
 .review-page-container {
   position: relative;
@@ -107,19 +164,80 @@ body {
     radial-gradient(circle at 50% 0%, rgba(14, 116, 144, 0.28) 0%, transparent 65%),
     linear-gradient(180deg, var(--bg-dark-overlay-top) 0%, var(--bg-dark-overlay-bottom) 100%),
     url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=2000&q=80') center/cover no-repeat fixed;
-  padding: 32px 24px 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 48px;
   color: var(--text-primary);
+  padding-bottom: 80px;
 }
 
 .review-hero-section {
   width: min(1380px, 100%);
   margin: 0 auto;
+  padding: 32px 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 }
 
+/* Callout Hero Banner Card */
+.hero-banner-container {
+  width: 100%;
+}
+
+.hero-callout-card {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(30, 27, 75, 0.85) 0%, rgba(15, 23, 42, 0.9) 60%, rgba(13, 20, 32, 0.95) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: var(--border-radius-main);
+  padding: 40px 48px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: var(--backdrop-blur-panel);
+  -webkit-backdrop-filter: var(--backdrop-blur-panel);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hero-subtitle-tag {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #c084fc;
+}
+
+.hero-title-main {
+  font-size: clamp(2rem, 3.5vw, 3.2rem);
+  font-weight: 800;
+  color: var(--text-heading);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.hero-action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  color: var(--cyan-glow);
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-decoration: none;
+  transition: gap var(--transition-fast), color var(--transition-fast);
+}
+
+.hero-action-link:hover {
+  color: #ffffff;
+  gap: 12px;
+}
+
+.arrow-icon {
+  font-size: 1.2rem;
+}
+
+/* Grid Layout */
 .review-hero-grid {
   display: grid;
   grid-template-columns: 1.55fr 1fr;
@@ -147,7 +265,7 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   4. LEFT PANEL: SEARCH & RESULTS
+   5. LEFT PANEL: SEARCH & RESULTS
    -------------------------------------------------------------------------- */
 .review-search-panel {
   padding: 32px;
@@ -210,10 +328,6 @@ body {
   font-size: 0.75rem;
   color: var(--text-dim);
   transition: transform var(--transition-normal);
-}
-
-.filter-btn[aria-expanded="true"] .dropdown-arrow {
-  transform: rotate(180deg);
 }
 
 .filter-dropdown-menu {
@@ -501,7 +615,7 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   5. RIGHT PANEL: REVIEW FORM & RATING
+   6. RIGHT PANEL: REVIEW FORM & RATING
    -------------------------------------------------------------------------- */
 .review-form-panel {
   padding: 32px;
@@ -527,6 +641,20 @@ body {
   border-radius: 20px;
   background: rgba(20, 24, 28, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.selected-placeholder {
+  padding: 24px 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  text-align: center;
+}
+
+.selected-placeholder p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
 
 .selected-preview-content {
@@ -718,11 +846,12 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   6. LOWER SECTION: REVIEWS FEED
+   7. LOWER SECTION: REVIEWS FEED
    -------------------------------------------------------------------------- */
 .review-feed-section {
   width: min(1380px, 100%);
   margin: 0 auto;
+  padding: 0 24px;
 }
 
 .review-section-header {
@@ -751,6 +880,15 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 24px;
+}
+
+.feed-loading-text,
+.feed-empty-text {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 1rem;
+  padding: 40px;
 }
 
 .feed-review-card {
@@ -883,7 +1021,7 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   7. KEYFRAMES & ANIMATIONS
+   8. KEYFRAMES & ANIMATIONS
    -------------------------------------------------------------------------- */
 @keyframes heartPop {
   0% { transform: scale(0.8); }
@@ -892,7 +1030,7 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   8. MEDIA QUERIES & RESPONSIVENESS
+   9. MEDIA QUERIES & RESPONSIVENESS
    -------------------------------------------------------------------------- */
 @media (max-width: 1200px) {
   .review-hero-grid {
@@ -900,10 +1038,31 @@ body {
   }
 }
 
+@media (max-width: 768px) {
+  .corporate-top-nav {
+    padding: 14px 20px;
+  }
+
+  .nav-links {
+    gap: 16px;
+  }
+
+  .nav-item {
+    font-size: 0.82rem;
+  }
+
+  .hero-callout-card {
+    padding: 28px 24px;
+  }
+}
+
 @media (max-width: 640px) {
   .review-page-container {
-    padding: 20px 14px 60px;
     gap: 32px;
+  }
+
+  .review-hero-section {
+    padding: 16px 14px 0;
   }
 
   .review-search-panel,
@@ -923,6 +1082,10 @@ body {
   .filter-btn {
     padding: 6px 10px;
     font-size: 0.8rem;
+  }
+
+  .review-feed-section {
+    padding: 0 14px;
   }
 
   .review-cards-grid {
